@@ -1,8 +1,8 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StatusBar } from "react-native";
 import { useFonts } from "expo-font";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
+import RootNavigation from "./src/navigation/RootNavigation";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,34 +15,23 @@ export default function App() {
     "Lato-Light": require("./assets/fonts/Lato/Lato-Light.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+  useEffect(() => {
+    async function hideSplashScreen() {
+      if (fontsLoaded) {
+        await SplashScreen.hideAsync();
+      }
     }
+
+    hideSplashScreen();
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   }
   return (
-    <View
-      style={styles.container}
-      onLayout={onLayoutRootView}
-      className="bg-black"
-    >
-      <Text className="text-pr" style={{ fontFamily: "BebasNeue-Regular" }}>
-        Open up App.js to start working on your app!
-      </Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <StatusBar backgroundColor="black" barStyle="light-content" />
+      <RootNavigation />
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
