@@ -1,20 +1,15 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
 import HomeScreen from "../../screens/HomeScreen";
-import MenuScreen from "../../screens/MenuScreen";
 import RewardsScreen from "../../screens/RewardsScreen";
-import DealsScreen from "../../screens/DealsScreen";
-import ProfileScreen from "../../screens/ProfileScreen";
-
 import LogoFocused from "../../../assets/icons/LogoFocused.svg";
-import DealsFocused from "../../../assets/icons/DealsFocused.svg";
 import RewardFocused from "../../../assets/icons/RewardFocused.svg";
-
 import Logo from "../../../assets/icons/Logo.svg";
-import Deals from "../../../assets/icons/Deals.svg";
 import Reward from "../../../assets/icons/Reward.svg";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import MenuNavigation from "./MenuNavigation";
+import ProfileNavigation from "./ProfileNavigation";
+
 const TabNavigation = () => {
   const MainTab = createBottomTabNavigator();
   return (
@@ -26,7 +21,7 @@ const TabNavigation = () => {
             case "Home":
               iconName = focused ? <LogoFocused /> : <Logo />;
               break;
-            case "Menu":
+            case "MenuNav":
               iconName = focused ? (
                 <Feather name="menu" size={28} color="#F7A600" />
               ) : (
@@ -36,10 +31,8 @@ const TabNavigation = () => {
             case "Rewards":
               iconName = focused ? <Reward /> : <RewardFocused />;
               break;
-            case "Deals":
-              iconName = focused ? <Deals /> : <DealsFocused />;
-              break;
-            case "Profile":
+
+            case "ProfileNav":
               iconName = focused ? (
                 <Ionicons name="ios-person-outline" size={24} color="#F7A600" />
               ) : (
@@ -63,24 +56,20 @@ const TabNavigation = () => {
         options={{ headerShown: false }}
       />
       <MainTab.Screen
-        name="Menu"
-        component={MenuScreen}
-        options={{ headerShown: false }}
+        name="MenuNav"
+        component={MenuNavigation}
+        options={{ headerShown: false, title: "Menu" }}
       />
       <MainTab.Screen
         name="Rewards"
         component={RewardsScreen}
         options={{ headerShown: false }}
       />
+
       <MainTab.Screen
-        name="Deals"
-        component={DealsScreen}
-        options={{ headerShown: false }}
-      />
-      <MainTab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{ headerShown: false }}
+        name="ProfileNav"
+        component={ProfileNavigation}
+        options={{ headerShown: false, title: "Profile" }}
       />
     </MainTab.Navigator>
   );

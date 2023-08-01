@@ -3,7 +3,8 @@ import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import RootNavigation from "./src/navigation/RootNavigation";
-
+import { store } from "./src/redux/store";
+import { Provider } from "react-redux";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -29,9 +30,11 @@ export default function App() {
     return null;
   }
   return (
-    <>
-      <StatusBar backgroundColor="black" barStyle="light-content" />
-      <RootNavigation />
-    </>
+    <Provider store={store}>
+      <>
+        <StatusBar backgroundColor="black" barStyle="light-content" />
+        <RootNavigation />
+      </>
+    </Provider>
   );
 }
