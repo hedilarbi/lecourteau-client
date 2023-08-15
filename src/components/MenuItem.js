@@ -12,13 +12,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useNavigation } from "@react-navigation/native";
 import DropDown from "./DropDown";
+import { selectUser, setUser } from "../redux/slices/userSlice";
+import { addToFavorites, removeFromFavorites } from "../services/UserServices";
 
 const MenuItem = ({ name, image, description, prices, id }) => {
   const [open, setOpen] = useState(false);
-
+  const [like, setLike] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const itemsList = useSelector(selectBasketItemsWithID(id));
+  const user = useSelector(selectUser);
 
   const sizes = prices.map((item) => item.size);
   const [size, setSize] = useState(prices[0].size);
@@ -29,6 +32,36 @@ const MenuItem = ({ name, image, description, prices, id }) => {
   };
   const removeItemFromBasket = () => {
     dispatch(removeFromBasket({ id }));
+  };
+
+  useEffect(() => {
+    if (user.favorites.includes(id)) {
+      setLike(true);
+    }
+  }, []);
+
+  const handleLikeButton = () => {
+    if (like) {
+      removeFromFavorites(user._id, id)
+        .then((response) => {
+          if (response.status) {
+            dispatch(setUser(response.data));
+          }
+        })
+        .then(() => {
+          setLike(!like);
+        });
+    } else {
+      addToFavorites(user._id, id)
+        .then((response) => {
+          if (response.status) {
+            dispatch(setUser(response.data));
+          }
+        })
+        .then(() => {
+          setLike(!like);
+        });
+    }
   };
 
   useEffect(() => {
@@ -54,7 +87,15 @@ const MenuItem = ({ name, image, description, prices, id }) => {
               {description}
             </Text> */}
           </View>
-          <AntDesign name="hearto" size={24} color="#E72D2D" />
+          {like ? (
+            <TouchableOpacity onPress={handleLikeButton}>
+              <AntDesign name="heart" size={24} color="#E72D2D" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={handleLikeButton}>
+              <AntDesign name="hearto" size={24} color="#E72D2D" />
+            </TouchableOpacity>
+          )}
         </View>
         <View className="flex-row items-center justify-between">
           <Text

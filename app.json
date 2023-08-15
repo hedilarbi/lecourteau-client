@@ -11,20 +11,33 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hedilarbi95.lecourteauclient",
+      "config": {
+        "googleMapsApiKey": "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w"
+        }
+      },
+      "package": "com.hedilarbi95.lecourteauclient"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cfd95bcc-7f5d-4868-b417-28aee71e3a2f"
+      }
     }
   }
 }

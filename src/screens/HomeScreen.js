@@ -9,77 +9,81 @@ import { TouchableOpacity } from "react-native";
 import Menu from "../components/Menu";
 import Offers from "../components/Offers";
 import { selectBasketItems } from "../redux/slices/basketSlice";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { getCategories, getOffers } from "../services/FoodServices";
-import axios from "axios";
+
+import { selectUserAddress, setUserAddress } from "../redux/slices/userSlice";
 
 const HomeScreen = () => {
   const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
-  const basket = useSelector(selectBasketItems);
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  const userAddress = useSelector(selectUserAddress);
   const [categories, setCategories] = useState([]);
   const [offers, setOffers] = useState([]);
-  const [address, setAddress] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(true);
 
-  useEffect(() => {
+  const basket = useSelector(selectBasketItems);
+
+  const fetchData = async () => {
+    try {
+      const [categoriesResponse, offersResponse] = await Promise.all([
+        getCategories(),
+        getOffers(),
+      ]);
+
+      if (categoriesResponse.status) {
+        setCategories(categoriesResponse.data);
+      } else {
+        console.error("Categories data not found:", categoriesResponse.message);
+      }
+
+      if (offersResponse.status) {
+        setOffers(offersResponse.data);
+      } else {
+        console.error("Offers data not found:", offersResponse.message);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const getUserLocation = async () => {
     Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
 
-      let location = await Location.getCurrentPositionAsync({});
+    let location = await Location.getCurrentPositionAsync({});
 
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=${GOOGLE_MAPS_API_KEY}`
-      );
-      if (response.data.results.length > 0) {
-        setAddress(response.data.results[0].formatted_address);
+    const reverseGeocodeAddress = await Location.reverseGeocodeAsync(
+      {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      },
+      {
+        useGoogleMaps: true,
       }
-      // const reverseGeocodeAddress = await Location.reverseGeocodeAsync(
-      //   {
-      //     latitude: location.coords.latitude,
-      //     longitude: location.coords.longitude,
-      //   },
-      //   {
-      //     useGoogleMaps: true,
-      //   }
-      // );
-      // console.log(reverseGeocodeAddress);
-    })();
-  }, []);
+    );
+
+    dispatch(
+      setUserAddress({
+        address: reverseGeocodeAddress[1],
+        location: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+      })
+    );
+    setLocationLoading(false);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [categoriesResponse, offersResponse] = await Promise.all([
-          getCategories(),
-          getOffers(),
-        ]);
-
-        if (categoriesResponse.status) {
-          setCategories(categoriesResponse.data);
-        } else {
-          console.error(
-            "Categories data not found:",
-            categoriesResponse.message
-          );
-        }
-
-        if (offersResponse.status) {
-          setOffers(offersResponse.data);
-        } else {
-          console.error("Offers data not found:", offersResponse.message);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
+    getUserLocation();
     fetchData();
   }, []);
 
@@ -101,56 +105,12 @@ const HomeScreen = () => {
           </View>
         </TouchableOpacity>
       )}
-      <UserAddress address={address} />
-      <View className="mt-4">
-        <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-lg">
-          what's new
-        </Text>
-        <View className="bg-pr h-0.5 w-8 "></View>
-      </View>
+      <UserAddress address={userAddress.address} loading={locationLoading} />
+
       <News />
-      <View className="mt-4 flex-row justify-between items-center">
-        <View>
-          <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-lg">
-            explore menu
-          </Text>
-          <View className="bg-pr h-0.5 w-8 "></View>
-        </View>
-        <TouchableOpacity
-          className="flex-row items-center"
-          onPress={() => navigation.navigate("MenuNav")}
-        >
-          <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-sm">
-            view all
-          </Text>
-          <AntDesign
-            name="arrowright"
-            size={20}
-            color="black"
-            className="ml-2"
-          />
-        </TouchableOpacity>
-      </View>
+
       <Menu categories={categories} />
-      <View className="mt-4 flex-row justify-between items-center">
-        <View>
-          <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-lg">
-            top offers
-          </Text>
-          <View className="bg-pr h-0.5 w-8 "></View>
-        </View>
-        <TouchableOpacity className="flex-row items-center">
-          <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-sm">
-            view all
-          </Text>
-          <AntDesign
-            name="arrowright"
-            size={20}
-            color="black"
-            className="ml-2"
-          />
-        </TouchableOpacity>
-      </View>
+
       <Offers offers={offers} />
     </SafeAreaView>
   );

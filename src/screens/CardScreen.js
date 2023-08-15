@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   selectBasketItems,
   selectBasketTotal,
@@ -16,14 +16,19 @@ import {
 import { Fonts } from "../constants";
 import CardMenuItem from "../components/CardMenuItem";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { selectUser } from "../redux/slices/userSlice";
+import { setOrder } from "../redux/slices/orderSlide";
 
 const CardScreen = () => {
   const basketItems = useSelector(selectBasketItems);
-
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [instructions, setInstructions] = useState("");
   const deliveryFee = 5;
   const subTotal = useSelector(selectBasketTotal);
   const total = deliveryFee + parseFloat(subTotal);
+  const user = useSelector(selectUser);
 
   const [basketList, setBasketList] = useState([]);
 
@@ -31,7 +36,33 @@ const CardScreen = () => {
     setBasketList(basketItems);
   }, [basketItems]);
 
-  const checkout = () => {};
+  const checkout = () => {
+    const orderItems = [];
+    basketList.map((item) => {
+      const customizations = item.customization
+        ? item.customization.map((customizationItem) => customizationItem._id)
+        : [];
+
+      orderItems.push({
+        size: item.size,
+        customizations,
+        price: item.price,
+      });
+    });
+
+    const order = {
+      user_id: user._id,
+      orderItems,
+      subTotal,
+      total,
+      deliveryFee,
+      instructions,
+    };
+
+    dispatch(setOrder(order));
+
+    navigation.navigate("Checkout");
+  };
   return (
     <KeyboardAvoidingView
       className="flex-1"
@@ -112,7 +143,10 @@ const CardScreen = () => {
             </Text>
           </View>
         </View>
-        <TouchableOpacity className="bg-pr rounded-md items-center justify-center py-4  mt-4">
+        <TouchableOpacity
+          className="bg-pr rounded-md items-center justify-center py-4  mt-4"
+          onPress={checkout}
+        >
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
             Checkout
           </Text>
