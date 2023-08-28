@@ -1,4 +1,4 @@
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import UserAddress from "../components/UserAddress";
@@ -8,110 +8,179 @@ import { AntDesign } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import Menu from "../components/Menu";
 import Offers from "../components/Offers";
-import { selectBasketItems } from "../redux/slices/basketSlice";
+import { selectBasket, selectBasketItems } from "../redux/slices/basketSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { getCategories, getOffers } from "../services/FoodServices";
-
+import { API_URL } from "@env";
 import { selectUserAddress, setUserAddress } from "../redux/slices/userSlice";
+import { getRestaurantSettings } from "../services/RestaurantServices";
+import WarningBanner from "../components/WarningBanner";
+import { setSettings } from "../redux/slices/settingsSlice";
+import Map from "../components/Map";
+import { ActivityIndicator } from "react-native";
+import Error from "../components/Error";
 
 const HomeScreen = () => {
+  const [showMap, setShowMap] = useState(false);
   const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const userAddress = useSelector(selectUserAddress);
+
   const [categories, setCategories] = useState([]);
   const [offers, setOffers] = useState([]);
-  const [locationLoading, setLocationLoading] = useState(true);
-
-  const basket = useSelector(selectBasketItems);
+  const [showWarningBanner, setShowWarningBanner] = useState(false);
+  const basket = useSelector(selectBasket);
+  const [isLoading, setIsLoading] = useState(true);
+  const [addressIsLoading, setAddressIsLoading] = useState(true);
+  const [refresh, setRefresh] = useState(0);
+  const [errors, setErrors] = useState(false);
 
   const fetchData = async () => {
+    setIsLoading(true);
+    setErrors(false);
     try {
-      const [categoriesResponse, offersResponse] = await Promise.all([
-        getCategories(),
-        getOffers(),
-      ]);
+      const [categoriesResponse, offersResponse, settingsResponse] =
+        await Promise.all([
+          getCategories(),
+          getOffers(),
+          getRestaurantSettings(),
+        ]);
 
       if (categoriesResponse.status) {
         setCategories(categoriesResponse.data);
       } else {
-        console.error("Categories data not found:", categoriesResponse.message);
+        setErrors(true);
+      }
+      if (settingsResponse.status) {
+        dispatch(setSettings(settingsResponse.data));
+
+        if (
+          settingsResponse.data.open === false ||
+          settingsResponse.data.delivey === false
+        ) {
+          setShowWarningBanner(true);
+        }
+      } else {
+        setErrors(true);
       }
 
       if (offersResponse.status) {
         setOffers(offersResponse.data);
       } else {
-        console.error("Offers data not found:", offersResponse.message);
+        setErrors(true);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setErrors(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const getUserLocation = async () => {
+    setAddressIsLoading(true);
     Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      setErrorMsg("Permission to access location was denied");
-      return;
-    }
-
-    let location = await Location.getCurrentPositionAsync({});
-
-    const reverseGeocodeAddress = await Location.reverseGeocodeAsync(
-      {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      },
-      {
-        useGoogleMaps: true,
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        return;
       }
-    );
 
-    dispatch(
-      setUserAddress({
-        address: reverseGeocodeAddress[1],
-        location: {
+      let location = await Location.getCurrentPositionAsync({});
+
+      const response = await Location.reverseGeocodeAsync(
+        {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         },
-      })
-    );
-    setLocationLoading(false);
+        {
+          useGoogleMaps: true,
+        }
+      );
+
+      const address =
+        response[1].streetNumber +
+        ", " +
+        response[1].street +
+        ", " +
+        response[1].city +
+        ", " +
+        response[1].region;
+
+      dispatch(
+        setUserAddress({
+          address: address,
+          location: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      setErrors(true);
+    } finally {
+      setAddressIsLoading(false);
+    }
   };
 
   useEffect(() => {
     getUserLocation();
     fetchData();
-  }, []);
+  }, [refresh]);
+
+  if (isLoading || addressIsLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="black" />
+      </View>
+    );
+  }
+
+  if (errors) {
+    return <Error setRefresh={setRefresh} />;
+  }
 
   return (
-    <SafeAreaView className="flex-1 bg-bg px-3 py-4">
-      {basket?.length > 0 && (
-        <TouchableOpacity
-          className="bg-pr rounded-full p-4 absolute bottom-5 right-5 z-30"
-          onPress={() => navigation.navigate("MenuNav", { screen: "Card" })}
-        >
-          <AntDesign name="shoppingcart" size={30} color="black" />
-          <View className="absolute top-0 right-0 rounded-full bg-black h-5 w-5 items-center">
-            <Text
-              className="text-sm text-white"
-              style={{ fontFamily: Fonts.LATO_BOLD }}
+    <SafeAreaView
+      className={showMap ? "flex-1 bg-bg " : "flex-1 bg-bg  px-3 py-4"}
+    >
+      {showWarningBanner && <WarningBanner />}
+      {showMap ? (
+        <Map setShowMap={setShowMap} />
+      ) : (
+        <View className="flex-1">
+          {(basket?.offers?.length > 0 ||
+            basket?.items.length > 0 ||
+            basket?.rewards.length > 0) && (
+            <TouchableOpacity
+              className="bg-pr rounded-full p-4 absolute bottom-5 right-5 z-30"
+              onPress={() => navigation.navigate("MenuNav", { screen: "Card" })}
             >
-              {basket.length}
-            </Text>
-          </View>
-        </TouchableOpacity>
+              <AntDesign name="shoppingcart" size={30} color="black" />
+              <View className="absolute top-0 right-0 rounded-full bg-black h-5 w-5 items-center">
+                <Text
+                  className="text-sm text-white"
+                  style={{ fontFamily: Fonts.LATO_BOLD }}
+                >
+                  {basket.items.length +
+                    basket.offers.length +
+                    basket.rewards.length}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          <UserAddress setShowMap={setShowMap} />
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <News />
+
+            <Menu categories={categories} />
+
+            <Offers offers={offers} />
+          </ScrollView>
+        </View>
       )}
-      <UserAddress address={userAddress.address} loading={locationLoading} />
-
-      <News />
-
-      <Menu categories={categories} />
-
-      <Offers offers={offers} />
     </SafeAreaView>
   );
 };

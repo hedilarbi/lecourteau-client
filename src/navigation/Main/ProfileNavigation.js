@@ -5,6 +5,7 @@ import OrdersScreen from "../../screens/OrdersScreen";
 import AddressesScreen from "../../screens/AddressesScreen";
 import CreditCardsScreen from "../../screens/CreditCardsScreen";
 import CompleteProfileScreen from "../../screens/CompleteProfileScreen";
+import OrderDetailsScreen from "../../screens/OrderDetailsScreen";
 const MenuNavigation = () => {
   const ProfileStack = createNativeStackNavigator();
 
@@ -50,6 +51,13 @@ const MenuNavigation = () => {
         component={CompleteProfileScreen}
         options={{
           title: "Complete Profile",
+        }}
+      />
+      <ProfileStack.Screen
+        name="Details"
+        component={OrderDetailsScreen}
+        options={{
+          title: "Order",
         }}
       />
     </ProfileStack.Navigator>

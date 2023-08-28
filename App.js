@@ -21,22 +21,6 @@ export default function App() {
     "Lato-Regular": require("./assets/fonts/Lato/Lato-Regular.ttf"),
     "Lato-Light": require("./assets/fonts/Lato/Lato-Light.ttf"),
   });
-  const [userToken, setUserToken] = useState(null);
-
-  const getUserToken = async () => {
-    const token = await getItemAsync("token");
-    setUserToken(token);
-  };
-
-  useEffect(() => {
-    async function hideSplashScreen() {
-      if (fontsLoaded && userToken) {
-        await SplashScreen.hideAsync();
-      }
-    }
-    getUserToken();
-    hideSplashScreen();
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
@@ -45,7 +29,7 @@ export default function App() {
     <Provider store={store}>
       <>
         <StatusBar backgroundColor="black" barStyle="light-content" />
-        <RootNavigation token={userToken} />
+        <RootNavigation />
       </>
     </Provider>
   );

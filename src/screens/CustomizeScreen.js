@@ -1,41 +1,84 @@
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Fonts } from "../constants";
 import { Entypo } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
-import { addToBasket } from "../redux/slices/basketSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToBasket,
+  selectBasketItemWithUID,
+  selectBasketItemsWithID,
+  updateItemInBasket,
+} from "../redux/slices/basketSlice";
 import { getMenuItem } from "../services/FoodServices";
+import Error from "../components/Error";
 const CustomizeScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
   const navigation = useNavigation();
-
+  const [refresh, setRefresh] = useState(0);
+  const [errors, setErrors] = useState(false);
   const [menuItem, setMenuItem] = useState([]);
   const [categorizedCustomization, setCategorizedCustomization] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  let itemFromBasket = null;
+  if (route.params.parent === "Card") {
+    itemFromBasket = useSelector(selectBasketItemWithUID(route.params.uid));
+  }
 
   useEffect(() => {
-    getMenuItem(route.params.id).then((response) => {
-      if (response?.status) {
-        const customizations = response?.data?.customization || [];
-        const CustomizationList = {};
-        customizations.forEach((item) => {
-          if (!CustomizationList[item.category.name]) {
-            CustomizationList[item.category.name] = [];
-          }
-          CustomizationList[item.category.name].push({
-            ...item,
-            state: false,
+    setErrors(false);
+    setIsLoading(true);
+    getMenuItem(route.params.id)
+      .then((response) => {
+        if (response?.status) {
+          const customizations = response?.data?.customization || [];
+          const CustomizationList = {};
+          customizations.forEach((item) => {
+            if (!CustomizationList[item.category.name]) {
+              CustomizationList[item.category.name] = [];
+            }
+            if (route.params.parent === "Card") {
+              if (
+                itemFromBasket[0].customization.some(
+                  (i) => i.name === item.name
+                )
+              ) {
+                CustomizationList[item.category.name].push({
+                  ...item,
+                  state: true,
+                });
+              } else {
+                CustomizationList[item.category.name].push({
+                  ...item,
+                  state: false,
+                });
+              }
+            } else {
+              CustomizationList[item.category.name].push({
+                ...item,
+                state: false,
+              });
+            }
           });
-        });
 
-        setCategorizedCustomization(CustomizationList);
-        setMenuItem(response?.data);
+          setCategorizedCustomization(CustomizationList);
+          setMenuItem(response?.data);
+        } else {
+          setErrors(true);
+        }
+      })
+      .finally(() => {
         setIsLoading(false);
-      }
-    });
-  }, []);
+      });
+  }, [refresh]);
 
   const addItemToBasket = () => {
     const selectedItems = Object.keys(categorizedCustomization).reduce(
@@ -48,8 +91,7 @@ const CustomizeScreen = () => {
       },
       []
     );
-
-    if (selectedItems.length > 0) {
+    if (route.params.parent === "Menu") {
       let newPrice = route.params.price;
       selectedItems.map((item) => (newPrice += item.price));
       dispatch(
@@ -62,55 +104,68 @@ const CustomizeScreen = () => {
           customization: selectedItems,
         })
       );
+
+      navigation.goBack();
     } else {
+      let newPrice = route.params.price;
+      selectedItems.map((item) => (newPrice += item.price));
       dispatch(
-        addToBasket({
-          id: menuItem._id,
-          name: menuItem.name,
-          image: menuItem.image,
-          price: route.params.price,
-          size: route.params.size,
+        updateItemInBasket({
+          uid: route.params.uid,
+          price: newPrice,
+          customization: selectedItems,
         })
       );
+
+      navigation.navigate("Card");
     }
-    navigation.goBack();
   };
 
   const handleCustomizationChange = (categoryName, itemId) => {
     setCategorizedCustomization((prevState) => {
-      // Make a copy of the previous state to avoid mutation
       const updatedState = { ...prevState };
-      // Find the category array
+
       const categoryArray = updatedState[categoryName];
-      // Find the index of the element with the given id
+
       const elementIndex = categoryArray.findIndex(
         (element) => element._id === itemId
       );
 
       if (elementIndex !== -1) {
-        // If the element is found, update its state
         categoryArray[elementIndex].state = !categoryArray[elementIndex].state;
       } else {
         console.error("Element not found!");
       }
 
-      // Return the updated state
       return updatedState;
     });
   };
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text>Loading</Text>
+      <View className="flex-1 items-center justify-center bg-bg">
+        <ActivityIndicator size="large" color="black" />
       </View>
     );
   }
+  if (errors) {
+    return <Error setRefresh={setRefresh} />;
+  }
   return (
     <View className="flex-1 bg-bg">
-      <View className=" h-40 bg-gray-400">
-        <Image source={{ uri: menuItem.image }} className="flex-1" />
+      <View className=" h-44 bg-gray-400">
+        <Image
+          source={{ uri: menuItem.image }}
+          className="flex-1"
+          style={{ resizeMode: "cover" }}
+        />
       </View>
+      <Text
+        style={{ fontFamily: Fonts.LATO_BOLD }}
+        className="px-3 mt-3 text-base"
+      >
+        {menuItem.name}
+      </Text>
       <ScrollView className="flex-1 p-3">
         {Object.entries(categorizedCustomization).map(([key, toppings]) => {
           return (
@@ -132,6 +187,7 @@ const CustomizeScreen = () => {
                         <Image
                           source={{ uri: topping.image }}
                           className="flex-1 rounded-full"
+                          style={{ resizeMode: "cover" }}
                         />
                       </View>
                       <Text
@@ -181,11 +237,11 @@ const CustomizeScreen = () => {
       </ScrollView>
 
       <TouchableOpacity
-        className="bg-pr rounded-md items-center justify-center py-4 mx-3 mb-4"
+        className="bg-pr rounded-md items-center justify-center py-3 mx-3 mb-4"
         onPress={addItemToBasket}
       >
         <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
-          Add To Cart
+          {route.params.parent === "Menu" ? "Add To Card" : "Save"}
         </Text>
       </TouchableOpacity>
     </View>

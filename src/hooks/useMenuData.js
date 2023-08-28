@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { getCategoriesNames, getMenuItems } from "../services/FoodServices";
 import { useRoute } from "@react-navigation/native";
 
-const useMenuData = () => {
+const useMenuData = (setIsLoading, refresh) => {
   const route = useRoute();
-
-  const [isLoading, setIsLoading] = useState(true);
+  const [errors, setErrors] = useState(false);
   const [menuCategories, setMenuCategories] = useState([
     { _id: "0", name: "All" },
   ]);
@@ -14,6 +13,8 @@ const useMenuData = () => {
   const [selectedItem, setSelectedItem] = useState(0);
 
   const fetchData = async () => {
+    setErrors(false);
+    setIsLoading(true);
     try {
       const [categoriesNamesResponse, menuItemsResponse] = await Promise.all([
         getCategoriesNames(),
@@ -26,10 +27,8 @@ const useMenuData = () => {
           ...categoriesNamesResponse.data,
         ]);
       } else {
-        console.error(
-          "Categories data not found:",
-          categoriesNamesResponse.message
-        );
+        setErrors(true);
+        return null;
       }
 
       if (menuItemsResponse.status) {
@@ -50,25 +49,27 @@ const useMenuData = () => {
           setFilteredMenuItemsList(menuItemsResponse.data);
         }
       } else {
-        console.error("Offers data not found:", offersResponse.message);
+        setErrors(true);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setErrors(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [refresh, route.params]);
 
   return {
-    isLoading,
     menuCategories,
     filteredMenuItemsList,
     menuItemsList,
     setFilteredMenuItemsList,
     setSelectedItem,
     selectedItem,
+    errors,
   };
 };
 

@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUserAddress, setUserAddress } from "../redux/slices/userSlice";
-import { Text, TouchableOpacity, View } from "react-native";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import * as Location from "expo-location";
+import { View } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import { TextInput } from "react-native";
+import * as Location from "expo-location";
 import { Fonts } from "../constants";
-import { useNavigation } from "@react-navigation/native";
-import { setOrderTypeAndAddress } from "../redux/slices/orderSlide";
-
-const DeliveryMap = () => {
+import { Text } from "react-native";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+const Map = ({ setShowMap }) => {
   const { location, address } = useSelector(selectUserAddress);
 
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+
   const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
   const initialRegion = {
     latitude: location.latitude,
@@ -75,20 +75,16 @@ const DeliveryMap = () => {
       })
     );
   };
-  const confirmation = () => {
-    dispatch(
-      setOrderTypeAndAddress({
-        coords: location,
-        type: "Delivery",
-        address: address,
-      })
-    );
-    navigation.navigate("Paiement");
-  };
   return (
     <View className="flex-1">
-      <View className="absolute  px-3 w-full  flex-row top-5 z-30">
-        <View className="bg-white rounded-md flex-row items-center flex-1">
+      <View className="absolute  px-3 w-full  flex-row top-7 z-30">
+        <TouchableOpacity
+          className="bg-black rounded-full p-2 justify-center items-center h-10 w-10"
+          onPress={() => setShowMap(false)}
+        >
+          <AntDesign name="arrowleft" size={24} color="#F7A600" />
+        </TouchableOpacity>
+        <View className="bg-white rounded-md flex-row items-center flex-1 ml-8">
           <GooglePlacesAutocomplete
             placeholder="Search"
             onPress={(data, details) => handlePlaceSelect(data, details)}
@@ -132,7 +128,7 @@ const DeliveryMap = () => {
         </View>
         <TouchableOpacity
           className="bg-pr rounded-md  items-center py-3 mt-4"
-          onPress={confirmation}
+          onPress={() => setShowMap(false)}
         >
           <Text
             style={{
@@ -148,4 +144,4 @@ const DeliveryMap = () => {
   );
 };
 
-export default DeliveryMap;
+export default Map;

@@ -1,10 +1,11 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Image } from "react-native";
 import { Fonts } from "../constants";
-import { AntDesign, Entypo } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import {
   addToBasket,
+  deleteFromBasket,
   removeFromBasket,
   selectBasketItemsWithID,
 } from "../redux/slices/basketSlice";
@@ -28,14 +29,14 @@ const MenuItem = ({ name, image, description, prices, id }) => {
   const [price, setPrice] = useState(prices[0].price);
 
   const addItemToBasket = () => {
-    dispatch(addToBasket({ id, price, size, name, image }));
+    dispatch(addToBasket({ id, price, size, name, image, customization: [] }));
   };
   const removeItemFromBasket = () => {
-    dispatch(removeFromBasket({ id }));
+    dispatch(deleteFromBasket({ id }));
   };
 
   useEffect(() => {
-    if (user.favorites.includes(id)) {
+    if (user.favorites?.includes(id)) {
       setLike(true);
     }
   }, []);
@@ -72,20 +73,37 @@ const MenuItem = ({ name, image, description, prices, id }) => {
   return (
     <View className="flex-row  bg-white mb-3 rounded-md" key={id}>
       <View className="h-32">
-        <Image source={{ uri: image }} className="h-full w-28 rounded-l-md" />
+        <Image source={{ uri: image }} className="h-full w-32 rounded-l-md" />
+        <TouchableOpacity
+          className="bg-pr flex-row  items-center py-2 px-3 absolute bottom-3 self-center"
+          onPress={() =>
+            navigation.navigate("Customize", {
+              id,
+              price,
+              size,
+              parent: "Menu",
+            })
+          }
+        >
+          <Text
+            style={{ fontFamily: Fonts.LATO_BOLD }}
+            className="text-black text-xs mr-3"
+          >
+            Customize
+          </Text>
+          <AntDesign name="arrowright" size={14} color="black" />
+        </TouchableOpacity>
       </View>
       <View className="flex-1 px-2 py-1 justify-between">
         <View className="flex-row justify-between items-center  ">
-          <View className="flex-row items-center">
-            <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+          <View className="flex-row items-center w-3/4">
+            <Text
+              style={{ fontFamily: Fonts.LATO_BOLD }}
+              className="text-sm "
+              numberOfLines={1}
+            >
               {name}
             </Text>
-            {/* <Text
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
-              className="text-xs text-tgry ml-2"
-            >
-              {description}
-            </Text> */}
           </View>
           {like ? (
             <TouchableOpacity onPress={handleLikeButton}>
@@ -104,6 +122,9 @@ const MenuItem = ({ name, image, description, prices, id }) => {
           >
             {price} $
           </Text>
+        </View>
+
+        <View className=" flex-row justify-between items-center ">
           <View className="justify-between">
             <Text
               style={{ fontFamily: Fonts.LATO_REGULAR }}
@@ -114,23 +135,6 @@ const MenuItem = ({ name, image, description, prices, id }) => {
             <DropDown sizes={sizes} setSize={setSize} size={size} />
             <View className="h-2"></View>
           </View>
-        </View>
-
-        <View className=" flex-row justify-between items-center ">
-          <TouchableOpacity
-            className="bg-black flex-row  items-center py-2 px-4"
-            onPress={() =>
-              navigation.navigate("Customize", { id, price, size })
-            }
-          >
-            <Text
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
-              className="text-white text-xs mr-3"
-            >
-              Customize
-            </Text>
-            <AntDesign name="arrowright" size={12} color="white" />
-          </TouchableOpacity>
           <View className="flex-row items-center">
             <TouchableOpacity
               className="bg-bg p-1"

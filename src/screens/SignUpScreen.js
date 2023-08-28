@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -16,8 +18,9 @@ import { useNavigation } from "@react-navigation/native";
 import * as Google from "expo-auth-session/providers/google";
 import { createUser } from "../services/UserServices";
 import { useDispatch } from "react-redux";
-import { setUser } from "../redux/slices/userSlice";
+import { setUser, setUserToken } from "../redux/slices/userSlice";
 import { setItemAsync } from "expo-secure-store";
+import { useRef } from "react";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -25,6 +28,9 @@ const SignUpScreen = () => {
   const [accessToken, setAccessToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const phoneNumberInput = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId:
       "879272250209-b53otha4u3m89k4locgb5i5r7ueu0m5m.apps.googleusercontent.com",
@@ -76,15 +82,34 @@ const SignUpScreen = () => {
   };
 
   const sendOtp = async () => {
-    createUser(phoneNumber).then((response) => {
-      if (response.status) {
-        saveUserToken(response.data.token);
-        dispatch(setUser(response.data.response));
-        navigation.navigate("Main");
-      } else {
-        Alert.alert(response.message);
-      }
+    phoneNumberInput.current.setNativeProps({
+      style: {
+        borderWidth: 0,
+      },
     });
+    if (phoneNumber.length <= 0) {
+      phoneNumberInput.current.setNativeProps({
+        style: {
+          borderColor: "red",
+          borderWidth: 2,
+        },
+      });
+      return null;
+    }
+    setIsLoading(true);
+    createUser(phoneNumber)
+      .then((response) => {
+        if (response.status) {
+          saveUserToken(response.data.token);
+          dispatch(setUserToken(response.data.token));
+          dispatch(setUser(response.data.user));
+        } else {
+          Alert.alert(response.message);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -92,6 +117,14 @@ const SignUpScreen = () => {
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      {isLoading && (
+        <View
+          className="flex-1 justify-center items-center absolute top-0 left-0 z-30"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+        >
+          <ActivityIndicator size="large" color="#F7A600" />
+        </View>
+      )}
       <SafeAreaView className="flex-1 bg-pr ">
         <View
           style={{ height: "50%", backgroundColor: "black" }}
@@ -109,7 +142,10 @@ const SignUpScreen = () => {
           >
             Login with a valid phone number
           </Text>
-          <View className="bg-white rounded-md mt-4 flex-row px-3 py-1">
+          <View
+            className="bg-white rounded-md mt-4 flex-row px-3 py-1"
+            ref={phoneNumberInput}
+          >
             <View className="flex-row bg-gray-100 px-3 py-2 items-center rounded-md">
               <CanadaFlag />
               <Text style={{ fontFamily: Fonts.LATO_REGULAR }}>+1</Text>

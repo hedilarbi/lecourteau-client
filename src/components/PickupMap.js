@@ -26,8 +26,8 @@ const restaurants = [
 const PickupMap = () => {
   const { location } = useSelector(selectUserAddress);
   const initialRegion = {
-    latitude: -123.083922,
-    longitude: 36.4220936,
+    latitude: restaurants[0].latitude,
+    longitude: restaurants[0].longitude,
     latitudeDelta: 0.1922,
     longitudeDelta: 0.1421,
   };
@@ -36,16 +36,17 @@ const PickupMap = () => {
       className="flex-1"
       initialRegion={initialRegion}
       provider={PROVIDER_GOOGLE}
+      key={`${initialRegion.latitude}-${initialRegion.longitude}`}
       //   onPress={(e) => {
       //     setLocation(e);
       //   }}
     >
-      {restaurants.map((restaurant, index) => (
+      {restaurants.map((item, index) => (
         <Marker
           key={index}
           coordinate={{
-            latitude: restaurant.latitude,
-            longitude: restaurant.longitude,
+            latitude: item.latitude,
+            longitude: item.longitude,
           }}
         />
       ))}

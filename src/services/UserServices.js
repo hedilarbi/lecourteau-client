@@ -1,11 +1,12 @@
 import axios from "axios";
-import { ApiUrl } from "../constants";
+import { API_URL } from "@env";
 
 const createUser = async (phone_number) => {
   try {
-    let createUserResponse = await axios.post(`${ApiUrl}/users/create`, {
+    let createUserResponse = await axios.post(`${API_URL}/users/create`, {
       phone_number,
     });
+
     if (createUserResponse?.status === 200) {
       return {
         status: true,
@@ -29,7 +30,7 @@ const createUser = async (phone_number) => {
 const addToFavorites = async (userId, itemId) => {
   try {
     let addToFavoritesResponse = await axios.put(
-      `${ApiUrl}/users/favorites/update/add/${userId}`,
+      `${API_URL}/users/favorites/update/add/${userId}`,
       { menuItem_id: itemId }
     );
     if (addToFavoritesResponse?.status === 200) {
@@ -54,7 +55,7 @@ const addToFavorites = async (userId, itemId) => {
 const removeFromFavorites = async (userId, itemId) => {
   try {
     let removeFromFavoritesResponse = await axios.put(
-      `${ApiUrl}/users/favorites/update/remove/${userId}`,
+      `${API_URL}/users/favorites/update/remove/${userId}`,
       { menuItem_id: itemId }
     );
     if (removeFromFavoritesResponse?.status === 200) {
@@ -79,16 +80,20 @@ const removeFromFavorites = async (userId, itemId) => {
 
 const getUserByToken = async (token) => {
   try {
-    let getUserByToken = await axios.get(`${ApiUrl}/users/userByToken/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (getUserByToken.status === 200) {
+    let getUserByTokenResponse = await axios.get(
+      `${API_URL}/users/userByToken/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        timeout: 10000,
+      }
+    );
+    if (getUserByTokenResponse.status === 200) {
       return {
         status: true,
         message: "user data",
-        data: getUserByToken.data,
+        data: getUserByTokenResponse.data,
       };
     } else {
       return {
@@ -104,4 +109,151 @@ const getUserByToken = async (token) => {
   }
 };
 
-export { createUser, removeFromFavorites, addToFavorites, getUserByToken };
+const setUserInfo = async (id, name, email, address) => {
+  try {
+    let updateUserInfoResponse = await axios.put(`${API_URL}/users/set/${id}`, {
+      name,
+      email,
+      address,
+    });
+    if (updateUserInfoResponse.status === 200) {
+      return {
+        status: true,
+        message: "user data",
+        data: updateUserInfoResponse.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+const updateUserInfo = async (id, name, email) => {
+  try {
+    let updateUserInfoResponse = await axios.put(
+      `${API_URL}/users/update/${id}`,
+      {
+        name,
+        email,
+      }
+    );
+    if (updateUserInfoResponse.status === 200) {
+      return {
+        status: true,
+        message: "user data",
+        data: updateUserInfoResponse.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
+const getOrdersList = async (id) => {
+  try {
+    let getOrdersListResponse = await axios.get(
+      `${API_URL}/users/orders/${id}`,
+      {
+        timeout: 10000,
+      }
+    );
+    if (getOrdersListResponse.status === 200) {
+      return {
+        status: true,
+        message: "user data",
+        data: getOrdersListResponse.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+const deleteUser = async (id) => {
+  try {
+    let deleteUserResponse = await axios.delete(
+      `${API_URL}/users/delete/${id}`,
+      {
+        timeout: 10000,
+      }
+    );
+    if (deleteUserResponse.status === 200) {
+      return {
+        status: true,
+        message: "user data",
+        data: deleteUserResponse.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+const getFavoritesList = async (id) => {
+  try {
+    let getFavoritesListResponse = await axios.get(
+      `${API_URL}/users/favorites/${id}`,
+      {
+        timeout: 10000,
+      }
+    );
+    if (getFavoritesListResponse.status === 200) {
+      return {
+        status: true,
+        message: "user data",
+        data: getFavoritesListResponse.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
+export {
+  createUser,
+  removeFromFavorites,
+  addToFavorites,
+  getUserByToken,
+  updateUserInfo,
+  getOrdersList,
+  getFavoritesList,
+  setUserInfo,
+  deleteUser,
+};

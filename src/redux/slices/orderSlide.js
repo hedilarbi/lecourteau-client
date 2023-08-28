@@ -16,6 +16,7 @@ export const orderSlice = createSlice({
         ...state,
         address: action.payload.address,
         type: action.payload.type,
+        coords: action.payload.coords,
       };
     },
   },

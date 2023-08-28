@@ -4,15 +4,10 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectBasketItems,
-  selectBasketTotal,
-} from "../redux/slices/basketSlice";
+import { selectBasket, selectBasketTotal } from "../redux/slices/basketSlice";
 import { Fonts } from "../constants";
 import CardMenuItem from "../components/CardMenuItem";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,25 +15,46 @@ import { useNavigation } from "@react-navigation/native";
 import { selectUser } from "../redux/slices/userSlice";
 import { setOrder } from "../redux/slices/orderSlide";
 
+import OfferCard from "../components/OfferCard";
+
+import RewardCard from "../components/RewardCard";
+import { selectSettings } from "../redux/slices/settingsSlice";
+import { SafeAreaView } from "react-native-safe-area-context";
+import WarningModel from "../components/WarningModel";
+
 const CardScreen = () => {
-  const basketItems = useSelector(selectBasketItems);
+  const basket = useSelector(selectBasket);
+  const { delivery_fee } = useSelector(selectSettings);
+
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [instructions, setInstructions] = useState("");
-  const deliveryFee = 5;
+
   const subTotal = useSelector(selectBasketTotal);
-  const total = deliveryFee + parseFloat(subTotal);
+  const total = delivery_fee + parseFloat(subTotal);
   const user = useSelector(selectUser);
 
-  const [basketList, setBasketList] = useState([]);
+  const [basketItems, setBasketItems] = useState([]);
+  const [basketOffers, setBasketOffers] = useState([]);
+  const [basketRewards, setBasketRewards] = useState([]);
+
+  const [showWarningModel, setShowWarningModel] = useState(false);
 
   useEffect(() => {
-    setBasketList(basketItems);
-  }, [basketItems]);
+    setBasketItems(basket.items);
+    setBasketOffers(basket.offers);
+    setBasketRewards(basket.rewards);
+  }, [basket]);
 
   const checkout = () => {
+    if (Object.keys(user).length === 0) {
+      setShowWarningModel(true);
+      return;
+    }
     const orderItems = [];
-    basketList.map((item) => {
+    const orderOffers = [];
+    const orderRewards = [];
+    basketItems.map((item) => {
       const customizations = item.customization
         ? item.customization.map((customizationItem) => customizationItem._id)
         : [];
@@ -47,15 +63,24 @@ const CardScreen = () => {
         size: item.size,
         customizations,
         price: item.price,
+        item: item.id,
       });
     });
 
+    if (basketOffers.length > 0) {
+      basketOffers.map((item) => orderOffers.push(item._id));
+    }
+    if (basketRewards.length > 0) {
+      basketRewards.map((item) => orderRewards.push(item._id));
+    }
     const order = {
       user_id: user._id,
       orderItems,
       subTotal,
       total,
-      deliveryFee,
+      offers: basketOffers,
+      rewards: basketRewards,
+      deliveryFee: delivery_fee,
       instructions,
     };
 
@@ -64,11 +89,11 @@ const CardScreen = () => {
     navigation.navigate("Checkout");
   };
   return (
-    <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <View className="px-3  py-3 bg-bg flex-1 ">
+    <SafeAreaView className="flex-1 bg-bg">
+      {showWarningModel && (
+        <WarningModel setShowWarningModel={setShowWarningModel} />
+      )}
+      <View className="px-3  py-3  flex-1 ">
         <View className="" style={{ height: "50%", width: "100%" }}>
           <ScrollView
             className="flex-1"
@@ -76,18 +101,66 @@ const CardScreen = () => {
               paddingVertical: 6,
             }}
           >
-            {basketList.map((item, index) => (
-              <CardMenuItem
-                name={item.name}
-                description={item.description}
-                image={item.image}
-                price={item.price}
-                customization={item.customization}
-                size={item.size}
-                id={item.id}
-                key={index}
-              />
-            ))}
+            {basketItems.length > 0 && (
+              <View>
+                <Text
+                  style={{ fontFamily: Fonts.LATO_REGULAR }}
+                  className="text-sm text-tgry mb-2"
+                >
+                  Items
+                </Text>
+                {basketItems.map((item, index) => (
+                  <CardMenuItem
+                    name={item.name}
+                    image={item.image}
+                    price={item.price}
+                    customization={item.customization}
+                    size={item.size}
+                    uid={item.uid}
+                    id={item.id}
+                    key={index}
+                  />
+                ))}
+              </View>
+            )}
+            {basketOffers.length > 0 && (
+              <View>
+                <Text
+                  style={{ fontFamily: Fonts.LATO_REGULAR }}
+                  className="text-sm text-tgry mb-2"
+                >
+                  Offers
+                </Text>
+                {basketOffers.map((item, index) => (
+                  <OfferCard
+                    id={item._id}
+                    key={item._id}
+                    image={item.image}
+                    price={item.price}
+                    items={item.items}
+                    name={item.name}
+                  />
+                ))}
+              </View>
+            )}
+            {basketRewards.length > 0 && (
+              <View>
+                <Text
+                  style={{ fontFamily: Fonts.LATO_REGULAR }}
+                  className="text-sm text-tgry mb-2"
+                >
+                  Rewards
+                </Text>
+                {basketRewards.map((item, index) => (
+                  <RewardCard
+                    id={item._id}
+                    key={item._id}
+                    points={item.points}
+                    name={item.item.name}
+                  />
+                ))}
+              </View>
+            )}
           </ScrollView>
         </View>
         <View className="flex-1">
@@ -100,7 +173,7 @@ const CardScreen = () => {
             <TextInput
               placeholder="Add Delivery Instructions (Optional)"
               placeholderTextColor="#857878"
-              style={{ fontFamily: Fonts.LATO_BOLD }}
+              style={{ fontFamily: Fonts.LATO_REGULAR }}
               className="ml-3 flex-1"
               onChangeText={(text) => {
                 setInstructions(text);
@@ -128,7 +201,18 @@ const CardScreen = () => {
               Delivery
             </Text>
             <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
-              {deliveryFee}$
+              {delivery_fee}$
+            </Text>
+          </View>
+          <View className="flex-row justify-between my-3 border-b pb-3 border-gray-300">
+            <Text
+              style={{ fontFamily: Fonts.LATO_REGULAR }}
+              className="text-sm text-tgry"
+            >
+              TVA
+            </Text>
+            <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+              ????
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -144,7 +228,7 @@ const CardScreen = () => {
           </View>
         </View>
         <TouchableOpacity
-          className="bg-pr rounded-md items-center justify-center py-4  mt-4"
+          className="bg-pr rounded-md items-center justify-center py-3    mt-4"
           onPress={checkout}
         >
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
@@ -152,22 +236,8 @@ const CardScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 export default CardScreen;
-
-// function groupItemsById(items) {
-//   const groupedItems = {};
-//   items.forEach((item) => {
-//     if (!item.customization) {
-//       if (!groupedItems[item.id]) {
-//         groupedItems[item.id] = [];
-//       }
-//       groupedItems[item.id].push(item);
-//     }
-//   });
-
-//   return Object.values(groupedItems);
-// }

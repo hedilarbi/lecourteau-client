@@ -9,18 +9,19 @@ import { ScrollView } from "react-native";
 
 import { Fonts } from "../constants";
 import MenuItem from "../components/MenuItem";
-import {
-  selectBasketItems,
-  selectBasketTotal,
-} from "../redux/slices/basketSlice";
+import { selectBasket, selectBasketTotal } from "../redux/slices/basketSlice";
 
 import useMenuData from "../hooks/useMenuData";
+import { useState } from "react";
+import { ActivityIndicator } from "react-native";
+import Error from "../components/Error";
 
 const MenuScreen = ({ navigation }) => {
   const flatListRef = useRef(null);
-  const basket = useSelector(selectBasketItems);
+  const basket = useSelector(selectBasket);
   const totalPrice = useSelector(selectBasketTotal);
-
+  const [refresh, setRefresh] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const filterMenuItems = (index, item) => {
     setSelectedItem(index);
 
@@ -41,7 +42,8 @@ const MenuScreen = ({ navigation }) => {
     setFilteredMenuItemsList,
     selectedItem,
     setSelectedItem,
-  } = useMenuData();
+    errors,
+  } = useMenuData(setIsLoading, refresh);
 
   const renderItem = ({ item, index }) => (
     <TouchableOpacity
@@ -58,15 +60,25 @@ const MenuScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  if (isLoading) {
+    return (
+      <View className="justify-center items-center flex-1">
+        <ActivityIndicator size="large" color="black" />
+      </View>
+    );
+  }
+  if (errors) {
+    return <Error setRefresh={setRefresh} />;
+  }
+
   return (
     <SafeAreaView className="bg-bg flex-1">
-      <View className="flex flex-row justify-end py-2 bg-white px-3">
-        <MaterialCommunityIcons name="magnify" size={28} color="black" />
-      </View>
-      {basket.length > 0 && (
+      {(basket?.offers?.length > 0 ||
+        basket?.items.length > 0 ||
+        basket?.rewards.length > 0) && (
         <View className="absolute bottom-0 bg-transparent flex-row items-center px-3 w-full z-30 mb-4">
           <TouchableOpacity
-            className="flex-1 bg-pr flex-row justify-between items-center px-10 py-4"
+            className="flex-1 bg-pr flex-row justify-between items-center px-10 py-3"
             onPress={() => navigation.navigate("Card")}
           >
             <View className="bg-[#AB7300] px-3 py-1">
@@ -74,7 +86,9 @@ const MenuScreen = ({ navigation }) => {
                 style={{ fontFamily: Fonts.BEBAS_NEUE }}
                 className="text-xl"
               >
-                {basket.length}
+                {basket.items.length +
+                  basket.offers.length +
+                  basket.rewards.length}
               </Text>
             </View>
             <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-xl">

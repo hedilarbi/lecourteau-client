@@ -11,7 +11,7 @@ const PaiementScreen = () => {
 
   return (
     <TouchableOpacity
-      className="bg-pr rounded-md items-center justify-center py-4  mt-4 w-full"
+      className="bg-pr rounded-md items-center justify-center py-3  mt-4 w-full"
       onPress={() => navigation.navigate("Process")}
     >
       <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">

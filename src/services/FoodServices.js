@@ -1,9 +1,11 @@
 import axios from "axios";
-import { ApiUrl } from "../constants";
+import { API_URL } from "@env";
 
 const getCategories = async () => {
   try {
-    let categoriesResponse = await axios.get(`${ApiUrl}/categories/`);
+    let categoriesResponse = await axios.get(`${API_URL}/categories/`, {
+      timeout: 10000,
+    });
     if (categoriesResponse?.status === 200) {
       return {
         status: true,
@@ -25,7 +27,9 @@ const getCategories = async () => {
 };
 const getCategoriesNames = async () => {
   try {
-    let categoriesResponse = await axios.get(`${ApiUrl}/categories/names`);
+    let categoriesResponse = await axios.get(`${API_URL}/categories/names`, {
+      timeout: 10000,
+    });
     if (categoriesResponse?.status === 200) {
       return {
         status: true,
@@ -48,7 +52,9 @@ const getCategoriesNames = async () => {
 
 const getOffers = async () => {
   try {
-    let offersResponse = await axios.get(`${ApiUrl}/offers/`);
+    let offersResponse = await axios.get(`${API_URL}/offers/`, {
+      timeout: 10000,
+    });
     if (offersResponse?.status === 200) {
       return {
         status: true,
@@ -70,7 +76,9 @@ const getOffers = async () => {
 };
 const getMenuItems = async () => {
   try {
-    let menuItemsResponse = await axios.get(`${ApiUrl}/menuItems/`);
+    let menuItemsResponse = await axios.get(`${API_URL}/menuItems/`, {
+      timeout: 10000,
+    });
     if (menuItemsResponse?.status === 200) {
       return {
         status: true,
@@ -93,7 +101,9 @@ const getMenuItems = async () => {
 
 const getMenuItem = async (id) => {
   try {
-    let menuItemResponse = await axios.get(`${ApiUrl}/menuItems/${id}`);
+    let menuItemResponse = await axios.get(`${API_URL}/menuItems/${id}`, {
+      timeout: 10000,
+    });
     if (menuItemResponse?.status === 200) {
       return {
         status: true,
@@ -115,7 +125,9 @@ const getMenuItem = async (id) => {
 };
 const getRewards = async () => {
   try {
-    let rewardsResponse = await axios.get(`${ApiUrl}/rewards/`);
+    let rewardsResponse = await axios.get(`${API_URL}/rewards/`, {
+      timeout: 10000,
+    });
     if (rewardsResponse?.status === 200) {
       return {
         status: true,

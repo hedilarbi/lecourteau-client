@@ -9,9 +9,11 @@ import Reward from "../../../assets/icons/Reward.svg";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import MenuNavigation from "./MenuNavigation";
 import ProfileNavigation from "./ProfileNavigation";
+import HomeNavigation from "./HomeNavigator";
 
 const TabNavigation = () => {
   const MainTab = createBottomTabNavigator();
+
   return (
     <MainTab.Navigator
       screenOptions={({ route }) => ({
@@ -52,7 +54,7 @@ const TabNavigation = () => {
     >
       <MainTab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeNavigation}
         options={{ headerShown: false }}
       />
       <MainTab.Screen
