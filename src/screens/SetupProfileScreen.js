@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, Alert } from "react-native";
 import React, { useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Fonts } from "../constants/";
@@ -32,8 +32,6 @@ const SetupProfileScreen = () => {
       aspect: [4, 3],
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
@@ -73,7 +71,7 @@ const SetupProfileScreen = () => {
         if (response.status) {
           dispatch(setUser(response.data));
         } else {
-          console.log(response.message);
+          Alert.alert("problem from setup profile Screen");
         }
       })
       .finally(() => {

@@ -5,9 +5,7 @@ import { useRoute } from "@react-navigation/native";
 const useMenuData = (setIsLoading, refresh) => {
   const route = useRoute();
   const [errors, setErrors] = useState(false);
-  const [menuCategories, setMenuCategories] = useState([
-    { _id: "0", name: "All" },
-  ]);
+  const [menuCategories, setMenuCategories] = useState([]);
   const [filteredMenuItemsList, setFilteredMenuItemsList] = useState([]);
   const [menuItemsList, setMenuItemsList] = useState([]);
   const [selectedItem, setSelectedItem] = useState(0);
@@ -22,8 +20,8 @@ const useMenuData = (setIsLoading, refresh) => {
       ]);
 
       if (categoriesNamesResponse.status) {
-        setMenuCategories((prevCategories) => [
-          ...prevCategories,
+        setMenuCategories([
+          { _id: "0", name: "All" },
           ...categoriesNamesResponse.data,
         ]);
       } else {

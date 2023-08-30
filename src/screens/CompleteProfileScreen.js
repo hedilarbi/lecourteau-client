@@ -1,4 +1,11 @@
-import { View, Text, SafeAreaView, TextInput, Image } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TextInput,
+  Image,
+  Alert,
+} from "react-native";
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
@@ -27,8 +34,6 @@ const CompleteProfileScreen = () => {
       aspect: [4, 3],
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
@@ -60,7 +65,7 @@ const CompleteProfileScreen = () => {
         if (response.status) {
           dispatch(setUser(response.data));
         } else {
-          console.log(response.message);
+          Alert.alert("problem from complete profile");
         }
       })
       .finally(() => {

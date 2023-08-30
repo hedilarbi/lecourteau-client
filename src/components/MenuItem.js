@@ -72,10 +72,10 @@ const MenuItem = ({ name, image, description, prices, id }) => {
 
   return (
     <View className="flex-row  bg-white mb-3 rounded-md" key={id}>
-      <View className="h-32">
-        <Image source={{ uri: image }} className="h-full w-32 rounded-l-md" />
+      <View className="h-24">
+        <Image source={{ uri: image }} className="h-full w-24 rounded-l-md" />
         <TouchableOpacity
-          className="bg-pr flex-row  items-center py-2 px-3 absolute bottom-3 self-center"
+          className="bg-pr flex-row  items-center py-1 px-2 absolute bottom-3 self-center"
           onPress={() =>
             navigation.navigate("Customize", {
               id,

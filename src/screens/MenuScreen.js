@@ -76,7 +76,7 @@ const MenuScreen = ({ navigation }) => {
       {(basket?.offers?.length > 0 ||
         basket?.items.length > 0 ||
         basket?.rewards.length > 0) && (
-        <View className="absolute bottom-0 bg-transparent flex-row items-center px-3 w-full z-30 mb-4">
+        <View className="absolute bottom-0 bg-transparent flex-row items-center px-2 w-full z-30 mb-4">
           <TouchableOpacity
             className="flex-1 bg-pr flex-row justify-between items-center px-10 py-3"
             onPress={() => navigation.navigate("Card")}
@@ -100,7 +100,7 @@ const MenuScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
-      <View className="pt-4 bg-white px-1">
+      <View className="pt-4 bg-white px-3">
         <FlatList
           horizontal
           data={menuCategories}
@@ -110,7 +110,7 @@ const MenuScreen = ({ navigation }) => {
           ref={flatListRef}
         />
       </View>
-      <ScrollView className="px-1 py-4 ">
+      <ScrollView className="px-2 py-4 ">
         {filteredMenuItemsList.map((item, index) => {
           const { name, image, description, prices, _id } = item;
 

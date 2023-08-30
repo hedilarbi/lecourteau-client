@@ -187,39 +187,6 @@ const CardScreen = () => {
               style={{ fontFamily: Fonts.LATO_REGULAR }}
               className="text-sm text-tgry"
             >
-              Subtotal
-            </Text>
-            <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
-              {subTotal}$
-            </Text>
-          </View>
-          <View className="flex-row justify-between my-3 border-b pb-3 border-gray-300">
-            <Text
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
-              className="text-sm text-tgry"
-            >
-              Delivery
-            </Text>
-            <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
-              {delivery_fee}$
-            </Text>
-          </View>
-          <View className="flex-row justify-between my-3 border-b pb-3 border-gray-300">
-            <Text
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
-              className="text-sm text-tgry"
-            >
-              TVA
-            </Text>
-            <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
-              ????
-            </Text>
-          </View>
-          <View className="flex-row justify-between">
-            <Text
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
-              className="text-sm text-tgry"
-            >
               Total
             </Text>
             <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
@@ -228,7 +195,7 @@ const CardScreen = () => {
           </View>
         </View>
         <TouchableOpacity
-          className="bg-pr rounded-md items-center justify-center py-3    mt-4"
+          className="bg-pr rounded-md items-center justify-center py-2  mt-4"
           onPress={checkout}
         >
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">

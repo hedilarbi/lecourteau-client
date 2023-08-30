@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -13,7 +13,7 @@ import { Fonts } from "../constants";
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const user = useSelector(selectUser);
-  console.log("Profile user:", user);
+
   const dispatch = useDispatch();
   const [showDeleteWarningModel, setShowDeleteWarningModel] = useState(false);
   const logoutUser = async () => {
@@ -21,7 +21,7 @@ const ProfileScreen = () => {
       await deleteItemAsync("token");
       dispatch(clearUser());
     } catch (err) {
-      console.log(err);
+      Alert.alert(err, "problem from setup profile");
     } finally {
       navigation.reset({
         index: 0,

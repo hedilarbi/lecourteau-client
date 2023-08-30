@@ -118,7 +118,6 @@ const HomeScreen = () => {
         })
       );
     } catch (error) {
-      console.log(error);
       setErrors(true);
     } finally {
       setAddressIsLoading(false);
