@@ -5,13 +5,11 @@ import { Dropdown } from "react-native-element-dropdown";
 import { Fonts } from "../constants";
 
 const DropDown = ({ sizes, setSize, size }) => {
-  const [isFocus, setIsFocus] = useState(false);
-
   const data = sizes.map((item, index) => ({ value: index, label: item }));
 
   return (
     <Dropdown
-      style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
+      style={[styles.dropdown]}
       placeholderStyle={styles.placeholderStyle}
       selectedTextStyle={styles.selectedTextStyle}
       selectedStyle={styles.selectedStyle}
@@ -21,14 +19,11 @@ const DropDown = ({ sizes, setSize, size }) => {
       data={data}
       maxHeight={300}
       labelField="label"
-      valueField="label"
-      placeholder={"Medium"}
+      valueField="value"
+      placeholder={size}
       value={size}
-      onFocus={() => setIsFocus(true)}
-      onBlur={() => setIsFocus(false)}
       onChange={(item) => {
         setSize(item.label);
-        setIsFocus(false);
       }}
     />
   );
@@ -40,8 +35,8 @@ const styles = StyleSheet.create({
   dropdown: {
     height: 22,
     width: 100,
-    borderColor: "gray",
-    borderWidth: 0.5,
+    borderColor: "#F7A600",
+    borderWidth: 1,
     paddingHorizontal: 3,
     paddingVertical: 2,
   },

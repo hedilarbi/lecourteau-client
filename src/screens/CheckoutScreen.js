@@ -20,10 +20,16 @@ import {
 import { selectSettings } from "../redux/slices/settingsSlice";
 import { selectBasketTotal } from "../redux/slices/basketSlice";
 import { Modal } from "react-native";
+import { setOrderTypeAndAddress } from "../redux/slices/orderSlide";
+import { useNavigation } from "@react-navigation/native";
+import PaimentModal from "../components/PaimentModal";
+import EditOrderModal from "../components/EditOrderModal";
 
 const CheckoutScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isDetailsModalVisible, setIsDetailsModalVisible] = useState(false);
   const { location, address } = useSelector(selectUserAddress);
+
   const { delivery_fee } = useSelector(selectSettings);
   const subTotal = useSelector(selectBasketTotal);
   const total = delivery_fee + parseFloat(subTotal);
@@ -37,16 +43,31 @@ const CheckoutScreen = () => {
     longitudeDelta: 0.0421,
   };
 
-  const selectCard = () => {
-    setModalVisible(false);
-  };
+  const navigation = useNavigation();
 
   const editOrder = () => {};
 
+  const processOrder = () => {
+    dispatch(
+      setOrderTypeAndAddress({ type: deliveryMode, address, coords: location })
+    );
+    navigation.navigate("Process");
+  };
+
   return (
     <View style={{ flex: 1, paddingBottom: 8 }}>
+      <PaimentModal
+        isModalVisible={isModalVisible}
+        setModalVisible={setModalVisible}
+      />
+      <EditOrderModal
+        deliveryMode={deliveryMode}
+        setDeliveryMode={setDeliveryMode}
+        isDetailsModalVisible={isDetailsModalVisible}
+        setIsDetailsModalVisible={setIsDetailsModalVisible}
+        address={address}
+      />
       <View style={{ height: Dimensions.get("window").height * 0.2 }}>
-        {/* Your map */}
         <MapView
           style={{ flex: 1 }}
           initialRegion={initialRegion}
@@ -79,7 +100,7 @@ const CheckoutScreen = () => {
             <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
               Your Delivery
             </Text>
-            <TouchableOpacity onPress={editOrder}>
+            <TouchableOpacity onPress={() => setIsDetailsModalVisible(true)}>
               <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
                 Edit
               </Text>
@@ -111,7 +132,14 @@ const CheckoutScreen = () => {
             }}
           >
             <MaterialIcons name="location-history" size={24} color="black" />
-            <Text style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}>
+            <Text
+              style={{
+                fontFamily: Fonts.LATO_REGULAR,
+                fontSize: 14,
+              }}
+              numberOfLines={1}
+              className="w-3/4"
+            >
               {address}
             </Text>
           </View>
@@ -199,71 +227,11 @@ const CheckoutScreen = () => {
           </View>
         </View>
       </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
+
+      <TouchableOpacity
+        className="bg-pr rounded-md items-center justify-center py-2 mt-4 mx-2"
+        onPress={processOrder}
       >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            backgroundColor: "rgba(0, 0, 0, 0.0)",
-          }}
-        >
-          <View
-            style={{
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              height: Dimensions.get("window").height * 0.4, // Half of the screen height
-              borderWidth: 1,
-            }}
-            className="bg-bg pb-3"
-          >
-            <View className="bg-white rounded-t-2xl p-3">
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)} // Close the modal
-              >
-                <AntDesign name="close" size={28} color="black" />
-              </TouchableOpacity>
-
-              <Text
-                style={{
-                  fontFamily: Fonts.LATO_BOLD,
-                  fontSize: 18,
-                  marginTop: 12,
-                }}
-              >
-                Select payment card
-              </Text>
-            </View>
-
-            <View className="flex-1">
-              <TouchableOpacity className="bg-white px-3 flex-row justify-between items-center mt-2 py-3">
-                <Text
-                  style={{
-                    fontFamily: Fonts.LATO_REGULAR,
-                    fontSize: 14,
-                  }}
-                >
-                  Use new card
-                </Text>
-                <Entypo name="plus" size={18} color="black" />
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity
-              className="bg-pr rounded-md items-center justify-center py-2  mx-2"
-              onPress={selectCard}
-            >
-              <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
-                Select
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      <TouchableOpacity className="bg-pr rounded-md items-center justify-center py-2    mt-4 mx-2">
         <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
           Process Order
         </Text>

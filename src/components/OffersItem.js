@@ -9,7 +9,9 @@ const OffersItem = ({ item }) => {
   return (
     <TouchableOpacity
       className="w-64 mr-4 bg-gray-300 rounded-lg"
-      onPress={() => navigation.navigate("Offer", { id: item._id })}
+      onPress={() =>
+        navigation.navigate("Offer", { id: item._id, parent: "Menu" })
+      }
     >
       <Image
         source={{ uri: item.image }}

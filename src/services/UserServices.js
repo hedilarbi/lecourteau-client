@@ -27,6 +27,32 @@ const createUser = async (phone_number) => {
   }
 };
 
+const updateUserExpoToken = async (id, token) => {
+  try {
+    let updateUserExpoTokenResponse = await axios.put(
+      `${API_URL}/users/update/expoToken/${id}`,
+      { token }
+    );
+    if (updateUserExpoTokenResponse?.status === 200) {
+      return {
+        status: true,
+        message: "expo token updated",
+        data: updateUserExpoTokenResponse?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't add",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
 const addToFavorites = async (userId, itemId) => {
   try {
     let addToFavoritesResponse = await axios.put(
@@ -256,4 +282,5 @@ export {
   getFavoritesList,
   setUserInfo,
   deleteUser,
+  updateUserExpoToken,
 };

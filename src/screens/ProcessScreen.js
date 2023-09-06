@@ -9,7 +9,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { clearBasket } from "../redux/slices/basketSlice";
 import { setUser } from "../redux/slices/userSlice";
 import { Fonts } from "../constants";
-import FullLogo from "../../assets/icons/FullLogo.svg";
+import FullLogoBlack from "../../assets/icons/FullLogoBlack.svg";
 import SuccessModel from "../components/SuccessModel";
 const ProcessScreen = () => {
   const order = useSelector(selectOrder);
@@ -18,6 +18,7 @@ const ProcessScreen = () => {
   const [error, setError] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [showSuccessModel, setShowSuccessModel] = useState(false);
+
   const processOrder = async () => {
     setError(false);
     createOrder(order)
@@ -51,12 +52,12 @@ const ProcessScreen = () => {
     }
   }, [showSuccessModel]);
   return (
-    <SafeAreaView className="bg-black justify-center items-center flex-1">
-      {showSuccessModel && <SuccessModel />}
+    <SafeAreaView className="bg-pr justify-center items-center flex-1">
+      <SuccessModel visiblity={showSuccessModel} />
       <View className="items-center">
-        <FullLogo />
+        <FullLogoBlack />
         {error ? (
-          <View>
+          <View className="mt-3">
             <Text
               style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
               className="text-red-300"

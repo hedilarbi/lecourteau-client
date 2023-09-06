@@ -20,6 +20,7 @@ const MenuScreen = ({ navigation }) => {
   const flatListRef = useRef(null);
   const basket = useSelector(selectBasket);
   const totalPrice = useSelector(selectBasketTotal);
+
   const [refresh, setRefresh] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const filterMenuItems = (index, item) => {
@@ -49,12 +50,12 @@ const MenuScreen = ({ navigation }) => {
     <TouchableOpacity
       className={
         selectedItem === index
-          ? "justify-center mr-6 border-b-2 border-pr"
+          ? "justify-center mr-6 border-b-4 border-pr"
           : "justify-center mr-6"
       }
       onPress={() => filterMenuItems(index, item)}
     >
-      <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-lg">
+      <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-xl">
         {item.name}
       </Text>
     </TouchableOpacity>
@@ -100,7 +101,7 @@ const MenuScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
-      <View className="pt-4 bg-white px-3">
+      <View className="pt-6 bg-white px-3">
         <FlatList
           horizontal
           data={menuCategories}
@@ -110,22 +111,21 @@ const MenuScreen = ({ navigation }) => {
           ref={flatListRef}
         />
       </View>
-      <ScrollView className="px-2 py-4 ">
-        {filteredMenuItemsList.map((item, index) => {
-          const { name, image, description, prices, _id } = item;
-
-          return (
-            <MenuItem
-              name={name}
-              image={image}
-              id={_id}
-              description={description}
-              prices={prices}
-              key={_id}
-            />
-          );
-        })}
-      </ScrollView>
+      <FlatList
+        data={filteredMenuItemsList}
+        renderItem={({ item }) => (
+          <MenuItem
+            name={item.name}
+            image={item.image}
+            id={item._id}
+            description={item.description}
+            prices={item.prices}
+            key={item._id}
+          />
+        )}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={{ paddingHorizontal: 2, paddingVertical: 4 }}
+      />
     </SafeAreaView>
   );
 };

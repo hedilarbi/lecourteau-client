@@ -15,53 +15,81 @@ import { useNavigation } from "@react-navigation/native";
 import DropDown from "./DropDown";
 import { selectUser, setUser } from "../redux/slices/userSlice";
 import { addToFavorites, removeFromFavorites } from "../services/UserServices";
+import WarningModel from "./WarningModel";
+import { memo } from "react";
+import OutOfStockModal from "./OutOfStockModal";
 
-const MenuItem = ({ name, image, description, prices, id }) => {
-  const [open, setOpen] = useState(false);
+const MenuItem = memo(({ name, image, prices, id, is_available }) => {
   const [like, setLike] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const itemsList = useSelector(selectBasketItemsWithID(id));
   const user = useSelector(selectUser);
-
+  const [isFail, setIsFail] = useState(false);
   const sizes = prices.map((item) => item.size);
   const [size, setSize] = useState(prices[0].size);
   const [price, setPrice] = useState(prices[0].price);
+  const [showWarningModel, setShowWarningModel] = useState(false);
+  const [showOutOfStockModal, setShowOutOfStockModal] = useState(false);
+
+  useEffect(() => {
+    if (isFail) {
+      const timer = setTimeout(() => {
+        setIsFail(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isFail]);
 
   const addItemToBasket = () => {
-    dispatch(addToBasket({ id, price, size, name, image, customization: [] }));
+    if (is_available) {
+      dispatch(
+        addToBasket({ id, price, size, name, image, customization: [] })
+      );
+    } else {
+      setShowOutOfStockModal(true);
+    }
   };
   const removeItemFromBasket = () => {
     dispatch(deleteFromBasket({ id }));
   };
 
   useEffect(() => {
-    if (user.favorites?.includes(id)) {
+    if (user?.favorites?.includes(id)) {
       setLike(true);
     }
   }, []);
 
   const handleLikeButton = () => {
-    if (like) {
-      removeFromFavorites(user._id, id)
-        .then((response) => {
-          if (response.status) {
-            dispatch(setUser(response.data));
-          }
-        })
-        .then(() => {
-          setLike(!like);
-        });
+    if (!user || Object.keys(user).length === 0) {
+      setShowWarningModel(true);
     } else {
-      addToFavorites(user._id, id)
-        .then((response) => {
-          if (response.status) {
-            dispatch(setUser(response.data));
-          }
-        })
-        .then(() => {
-          setLike(!like);
-        });
+      if (like) {
+        removeFromFavorites(user._id, id)
+          .then((response) => {
+            if (response.status) {
+              dispatch(setUser(response.data));
+            } else {
+              setIsFail(false);
+            }
+          })
+          .then(() => {
+            setLike(!like);
+          });
+      } else {
+        addToFavorites(user._id, id)
+          .then((response) => {
+            if (response.status) {
+              dispatch(setUser(response.data));
+            } else {
+              setIsFail(false);
+            }
+          })
+          .then(() => {
+            setLike(!like);
+          });
+      }
     }
   };
 
@@ -71,9 +99,18 @@ const MenuItem = ({ name, image, description, prices, id }) => {
   }, [size]);
 
   return (
-    <View className="flex-row  bg-white mb-3 rounded-md" key={id}>
-      <View className="h-24">
-        <Image source={{ uri: image }} className="h-full w-24 rounded-l-md" />
+    <View className="flex-row  bg-white mb-3 rounded-md mt-2 mx-2" key={id}>
+      <WarningModel
+        setShowWarningModel={setShowWarningModel}
+        showWarningModel={showWarningModel}
+      />
+      <OutOfStockModal
+        setShowOutOfStockModal={setShowOutOfStockModal}
+        showOutOfStockModal={showOutOfStockModal}
+      />
+
+      <View className="h-32">
+        <Image source={{ uri: image }} className="h-full w-32 rounded-l-md" />
         <TouchableOpacity
           className="bg-pr flex-row  items-center py-1 px-2 absolute bottom-3 self-center"
           onPress={() =>
@@ -99,7 +136,7 @@ const MenuItem = ({ name, image, description, prices, id }) => {
           <View className="flex-row items-center w-3/4">
             <Text
               style={{ fontFamily: Fonts.LATO_BOLD }}
-              className="text-sm "
+              className="text-sm w-3/4 "
               numberOfLines={1}
             >
               {name}
@@ -122,6 +159,14 @@ const MenuItem = ({ name, image, description, prices, id }) => {
           >
             {price} $
           </Text>
+          {!is_available && (
+            <Text
+              style={{ fontFamily: Fonts.LATO_REGULAR }}
+              className="text-sm text-red-500"
+            >
+              out of stock
+            </Text>
+          )}
         </View>
 
         <View className=" flex-row justify-between items-center ">
@@ -157,6 +202,6 @@ const MenuItem = ({ name, image, description, prices, id }) => {
       </View>
     </View>
   );
-};
+});
 
 export default MenuItem;

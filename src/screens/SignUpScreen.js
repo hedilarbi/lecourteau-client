@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -21,6 +20,7 @@ import { useDispatch } from "react-redux";
 import { setUser, setUserToken } from "../redux/slices/userSlice";
 import { setItemAsync } from "expo-secure-store";
 import { useRef } from "react";
+import ErrorModal from "../components/ErrorModal";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -30,6 +30,16 @@ const SignUpScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const phoneNumberInput = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFail, setIsFail] = useState(false);
+  useEffect(() => {
+    if (isFail) {
+      const timer = setTimeout(() => {
+        setIsFail(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isFail]);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId:
@@ -48,7 +58,6 @@ const SignUpScreen = () => {
       });
 
       if (result.type === "success") {
-        // If the user successfully logged in, set the accessToken and make the API call
         setAccessToken(result.authentication.accessToken);
 
         await fetch("https://www.googleapis.com/userinfo/v2/me", {
@@ -104,7 +113,7 @@ const SignUpScreen = () => {
           dispatch(setUserToken(response.data.token));
           dispatch(setUser(response.data.user));
         } else {
-          Alert.alert(response.message);
+          setIsFail(true);
         }
       })
       .finally(() => {
@@ -117,9 +126,10 @@ const SignUpScreen = () => {
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      <ErrorModal visiblity={isFail} />
       {isLoading && (
         <View
-          className="flex-1 justify-center items-center absolute top-0 left-0 z-30"
+          className="justify-center items-center absolute top-0 left-0 z-30 h-full w-full"
           style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
         >
           <ActivityIndicator size="large" color="#F7A600" />

@@ -22,7 +22,11 @@ const CardMenuItem = ({ name, id, image, uid, size, price, customization }) => {
         </View>
         <View className=" flex-1 ml-3 justify-between ">
           <View className="flex-row items-center">
-            <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+            <Text
+              style={{ fontFamily: Fonts.LATO_BOLD }}
+              className="text-sm w-2/4"
+              numberOfLines={1}
+            >
               {name}
             </Text>
             <Text
@@ -65,7 +69,7 @@ const CardMenuItem = ({ name, id, image, uid, size, price, customization }) => {
           >
             {price} $
           </Text>
-          {customization.length > 0 && (
+          {customization?.length > 0 && (
             <TouchableOpacity
               className="items-center flex-row"
               onPress={() => setShowDetails(!showDetails)}

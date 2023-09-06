@@ -9,6 +9,7 @@ import { ScrollView } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { Fonts } from "../constants";
 import Error from "../components/Error";
+import { convertDate } from "../utils/dateHandlers";
 
 const OrderDetailsScreen = () => {
   const route = useRoute();
@@ -35,6 +36,20 @@ const OrderDetailsScreen = () => {
   useEffect(() => {
     fetchData();
   }, [refresh]);
+
+  const handleOrderStatusColor = (status) => {
+    switch (status) {
+      case "Done":
+        return "#2AB2DB";
+
+      case "On Going":
+        return "#F3A32B";
+      case "Canceled":
+        return "#FF0707";
+      case "On Delivery":
+        return "#2AED49";
+    }
+  };
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -48,36 +63,52 @@ const OrderDetailsScreen = () => {
   }
   return (
     <ScrollView className="flex-1 p-3 bg-bg">
-      <View className="bg-white p-2 rounded-md mt-3">
+      <View className="bg-white p-4 rounded-md mt-3">
         <View className="flex-row ">
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            Name:
+            Code:
           </Text>
           <Text
             className="ml-3"
             style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
           >
-            {order.user.name}
+            {order.code}
           </Text>
         </View>
         <View className="flex-row  mt-2">
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            Phone Number:
+            Status:
+          </Text>
+          <Text
+            className="ml-3"
+            style={{
+              fontFamily: Fonts.LATO_REGULAR,
+              fontSize: 14,
+              color: handleOrderStatusColor(order.status),
+            }}
+          >
+            {order.status}
+          </Text>
+        </View>
+        <View className="flex-row  mt-2">
+          <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+            Date:
           </Text>
           <Text
             className="ml-3"
             style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
           >
-            {order.user.phone_number}
+            {convertDate(order.createdAt)}
           </Text>
         </View>
         <View className="flex-row  mt-2">
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            address:
+            Address:
           </Text>
           <Text
-            className="ml-3"
+            className="ml-3 w-3/4"
             style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+            numberOfLines={1}
           >
             {order.address}
           </Text>
@@ -89,12 +120,13 @@ const OrderDetailsScreen = () => {
       >
         Items
       </Text>
-      <View className="bg-white rounded-md p-2 mt-3">
+      <View className="bg-white rounded-md p-4 mt-3 ">
         {order.orderItems.map((item, index) => (
           <View
             key={item._id}
             className={
-              index != order.orderItems.length - 1 && "border-b border-gray-300"
+              index != order.orderItems.length - 1 &&
+              "border-b border-gray-300 mb-2 pb-2"
             }
           >
             <View className="flex-row justify-between">
@@ -116,7 +148,7 @@ const OrderDetailsScreen = () => {
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
             Offers
           </Text>
-          <View className="bg-white rounded-md p-2 mt-3 border-gray-300">
+          <View className="bg-white rounded-md p-2 mt-3 border-gray-300 space-y-2">
             {order.offers.map((item, index) => (
               <View
                 key={item._id}
@@ -147,7 +179,7 @@ const OrderDetailsScreen = () => {
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
             Rewards
           </Text>
-          <View className="bg-white rounded-md p-2 mt-3">
+          <View className="bg-white rounded-md p-2 mt-3  space-y-2">
             {order.rewards.map((item, index) => (
               <View
                 key={item._id}
@@ -200,9 +232,9 @@ const OrderDetailsScreen = () => {
           >
             Delivery
           </Text>
-          {/* <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+          <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
             {order.delivery_fee}$
-        </Text> */}
+          </Text>
         </View>
         <View className="flex-row justify-between">
           <Text
@@ -216,6 +248,9 @@ const OrderDetailsScreen = () => {
           </Text>
         </View>
       </View>
+      <TouchableOpacity className="">
+        <Text>Cancel</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };

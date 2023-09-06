@@ -4,14 +4,23 @@
 
 import { StatusBar } from "react-native";
 import { useFonts } from "expo-font";
-import { useEffect, useState } from "react";
+import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
+import { Provider } from "react-redux";
+
 import RootNavigation from "./src/navigation/RootNavigation";
 import { store } from "./src/redux/store";
-import { Provider } from "react-redux";
-import { getItemAsync } from "expo-secure-store";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -28,7 +37,11 @@ export default function App() {
   return (
     <Provider store={store}>
       <>
-        <StatusBar backgroundColor="black" barStyle="light-content" />
+        <StatusBar
+          translucent={true}
+          backgroundColor="transparent"
+          barStyle="dark-content"
+        />
         <RootNavigation />
       </>
     </Provider>

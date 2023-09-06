@@ -4,7 +4,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
@@ -16,9 +15,11 @@ import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { clearUser } from "../redux/slices/userSlice";
 import { deleteItemAsync } from "expo-secure-store";
+import ErrorModal from "./ErrorModal";
 
 const DeleteWarning = ({ id, setShowDeleteWarning }) => {
   const [showSuccessModel, setShowSuccessModel] = useState(false);
+  const [showFailModal, setShowFailModal] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +31,7 @@ const DeleteWarning = ({ id, setShowDeleteWarning }) => {
         if (response.status) {
           setShowSuccessModel(true);
         } else {
-          Alert.alert("Opps");
+          setShowFailModal(true);
         }
       })
       .finally(() => {
@@ -49,15 +50,24 @@ const DeleteWarning = ({ id, setShowDeleteWarning }) => {
           index: 0,
           routes: [{ name: "SignUp" }],
         });
-      }, 1000);
+      }, 3000);
 
       return () => clearTimeout(timer); // Clear the timer if the component unmounts before 1 second
     }
-  }, [showSuccessModel]);
+
+    if (showFailModal) {
+      const timer = setTimeout(() => {
+        setShowFailModal(flase);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModel, showFailModal]);
 
   return (
     <View style={styles.container}>
-      {showSuccessModel && <SuccessModel />}
+      <SuccessModel visiblity={showSuccessModel} />
+      <ErrorModal visiblity={showFailModal} />
       {isLoading && (
         <View
           style={{

@@ -7,8 +7,8 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./assets/splash-yellow.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": ["**/*"],
@@ -30,7 +30,8 @@
           "apiKey": "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w"
         }
       },
-      "package": "com.hedilarbi95.lecourteauclient"
+      "package": "com.hedilarbi95.lecourteauclient",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -3,29 +3,22 @@
     "version": ">= 3.5.1"
   },
   "build": {
-    "development": {
-      "distribution": "internal",
-      "android": {
-        "gradleCommand": ":app:assembleDebug"
-      },
-      "ios": {
-        "buildConfiguration": "Debug",
-        "resourceClass": "m1-medium"
-      }
-    },
     "preview": {
-      "distribution": "internal",
-      "ios": {
-        "resourceClass": "m1-medium"
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "API_URL": "http://192.168.1.15:5000/api"
       }
     },
-    "production": {
-      "ios": {
-        "resourceClass": "m1-medium"
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
       }
-    }
-  },
-  "submit": {
+    },
+    "preview3": {
+      "developmentClient": true
+    },
     "production": {}
   }
 }

@@ -1,27 +1,42 @@
-import { View, Text, TouchableOpacity, Alert } from "react-native";
-import React, { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { clearUser, selectUser } from "../redux/slices/userSlice";
+import {
+  clearUser,
+  clearUserToken,
+  selectUser,
+} from "../redux/slices/userSlice";
 import { deleteItemAsync } from "expo-secure-store";
 import DeleteWarning from "../components/DeleteWarning";
 import { Fonts } from "../constants";
+import ErrorModal from "../components/ErrorModal";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const user = useSelector(selectUser);
-
+  const [isFail, setIsFail] = useState(false);
   const dispatch = useDispatch();
   const [showDeleteWarningModel, setShowDeleteWarningModel] = useState(false);
+
+  useEffect(() => {
+    if (isFail) {
+      const timer = setTimeout(() => {
+        setIsFail(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isFail]);
   const logoutUser = async () => {
     try {
       await deleteItemAsync("token");
-      dispatch(clearUser());
+      dispatch(clearUserToken());
     } catch (err) {
-      Alert.alert(err, "problem from setup profile");
+      setIsFail(false);
     } finally {
       navigation.reset({
         index: 0,
@@ -52,6 +67,7 @@ const ProfileScreen = () => {
   }
   return (
     <SafeAreaView className="flex-1 bg-bg ">
+      <ErrorModal visiblity={isFail} />
       {showDeleteWarningModel && (
         <DeleteWarning
           id={user._id}

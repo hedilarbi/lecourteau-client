@@ -19,7 +19,7 @@ import { Alert } from "react-native";
 const RootNavigation = () => {
   const RootStack = createNativeStackNavigator();
   const userToken = useSelector(selectUserToken);
-  const { is_profile_setup } = useSelector(selectUser);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
 
   const getUserToken = async () => {
@@ -43,6 +43,8 @@ const RootNavigation = () => {
           await SplashScreen.hideAsync();
         });
     } else {
+      dispatch(setUser({}));
+      dispatch(setUserToken(null));
       await SplashScreen.hideAsync();
     }
   };
@@ -52,36 +54,38 @@ const RootNavigation = () => {
   }, [userToken]);
 
   return (
-    <NavigationContainer>
-      <RootStack.Navigator>
-        {!userToken && (
-          <RootStack.Screen
-            name="SignUp"
-            component={SignUpScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
-        )}
-        {is_profile_setup === false ? (
-          <RootStack.Screen
-            name="SetupProfile"
-            component={SetupProfileScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
-        ) : (
-          <RootStack.Screen
-            name="Main"
-            component={TabNavigation}
-            options={{
-              headerShown: false,
-            }}
-          />
-        )}
-      </RootStack.Navigator>
-    </NavigationContainer>
+    <>
+      <NavigationContainer>
+        <RootStack.Navigator>
+          {!userToken && (
+            <RootStack.Screen
+              name="SignUp"
+              component={SignUpScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+          )}
+          {user?.is_profile_setup === false ? (
+            <RootStack.Screen
+              name="SetupProfile"
+              component={SetupProfileScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+          ) : (
+            <RootStack.Screen
+              name="Main"
+              component={TabNavigation}
+              options={{
+                headerShown: false,
+              }}
+            />
+          )}
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </>
   );
 };
 

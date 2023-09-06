@@ -6,6 +6,8 @@ import CustomizeScreen from "../../screens/CustomizeScreen";
 import CheckoutScreen from "../../screens/CheckoutScreen";
 import PaiementScreen from "../../screens/PaiementScreen";
 import ProcessScreen from "../../screens/ProcessScreen";
+import { HeaderBackButton } from "@react-navigation/elements";
+import { Fonts } from "../../constants";
 const MenuNavigation = () => {
   const MenuStack = createNativeStackNavigator();
 
@@ -18,10 +20,57 @@ const MenuNavigation = () => {
           headerShown: false,
         }}
       />
-      <MenuStack.Screen name="Card" component={CardScreen} />
-      <MenuStack.Screen name="Customize" component={CustomizeScreen} />
-      <MenuStack.Screen name="Checkout" component={CheckoutScreen} />
-      <MenuStack.Screen name="Paiement" component={PaiementScreen} />
+      <MenuStack.Screen
+        name="Card"
+        component={CardScreen}
+        options={({ navigation }) => ({
+          title: "Card", // Optional: You can set a custom title
+
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
+
+          headerLeft: (props) => (
+            <HeaderBackButton
+              {...props}
+              onPress={() => {
+                navigation.navigate("Menu");
+              }}
+            />
+          ),
+        })}
+      />
+      <MenuStack.Screen
+        name="Customize"
+        component={CustomizeScreen}
+        options={{
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
+        }}
+      />
+      <MenuStack.Screen
+        name="Checkout"
+        component={CheckoutScreen}
+        options={{
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
+        }}
+      />
+      <MenuStack.Screen
+        name="Paiement"
+        component={PaiementScreen}
+        options={{
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
+        }}
+      />
       <MenuStack.Screen
         name="Process"
         component={ProcessScreen}

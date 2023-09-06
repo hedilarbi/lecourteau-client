@@ -6,6 +6,8 @@ import AddressesScreen from "../../screens/AddressesScreen";
 import CreditCardsScreen from "../../screens/CreditCardsScreen";
 import CompleteProfileScreen from "../../screens/CompleteProfileScreen";
 import OrderDetailsScreen from "../../screens/OrderDetailsScreen";
+import { Fonts } from "../../constants";
+import { HeaderBackButton } from "@react-navigation/elements";
 const MenuNavigation = () => {
   const ProfileStack = createNativeStackNavigator();
 
@@ -22,6 +24,11 @@ const MenuNavigation = () => {
         name="Favorites"
         options={{
           title: "My Favorites",
+
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
         }}
         component={FavoritesScreen}
       />
@@ -29,6 +36,11 @@ const MenuNavigation = () => {
         name="Orders"
         options={{
           title: "My Orders",
+
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
         }}
         component={OrdersScreen}
       />
@@ -36,6 +48,10 @@ const MenuNavigation = () => {
         name="Addresses"
         options={{
           title: "My Addresses",
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
         }}
         component={AddressesScreen}
       />
@@ -44,21 +60,42 @@ const MenuNavigation = () => {
         component={CreditCardsScreen}
         options={{
           title: "My Credit Cards",
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
         }}
       />
       <ProfileStack.Screen
         name="CompleteProfile"
         component={CompleteProfileScreen}
         options={{
-          title: "Complete Profile",
+          title: "Setup Profile",
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
         }}
       />
       <ProfileStack.Screen
         name="Details"
         component={OrderDetailsScreen}
-        options={{
-          title: "Order",
-        }}
+        options={({ navigation }) => ({
+          title: "Card", // Optional: You can set a custom title
+
+          headerTitleStyle: {
+            fontFamily: Fonts.BEBAS_NEUE,
+            fontSize: 20,
+          },
+          headerLeft: (props) => (
+            <HeaderBackButton
+              {...props}
+              onPress={() => {
+                navigation.navigate("Profile");
+              }}
+            />
+          ),
+        })}
       />
     </ProfileStack.Navigator>
   );

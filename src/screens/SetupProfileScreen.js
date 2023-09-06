@@ -1,5 +1,12 @@
-import { View, Text, TouchableOpacity, TextInput, Alert } from "react-native";
-import React, { useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Fonts } from "../constants/";
 import { Entypo } from "@expo/vector-icons";
@@ -9,10 +16,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser, setUser } from "../redux/slices/userSlice";
 import { setUserInfo } from "../services/UserServices";
 import { ActivityIndicator } from "react-native";
+import ErrorModal from "../components/ErrorModal";
 
 const SetupProfileScreen = () => {
   const [name, setName] = useState("");
-  const [image, setImage] = useState("");
+
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
   const [region, setRegion] = useState("");
@@ -23,20 +31,17 @@ const SetupProfileScreen = () => {
   const { _id } = useSelector(selectUser);
   const nameInput = useRef(null);
   const emailInput = useRef(null);
+  const [isFail, setIsFail] = useState(false);
+  useEffect(() => {
+    if (isFail) {
+      // After 1 second, reset showSuccessModel to false
+      const timer = setTimeout(() => {
+        setIsFail(false);
+      }, 2000);
 
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      return () => clearTimeout(timer); // Clear the timer if the component unmounts before 1 second
     }
-  };
+  }, [isFail]);
 
   const updateUser = async () => {
     if (name.length <= 0) {
@@ -71,7 +76,7 @@ const SetupProfileScreen = () => {
         if (response.status) {
           dispatch(setUser(response.data));
         } else {
-          Alert.alert("problem from setup profile Screen");
+          setIsFail(true);
         }
       })
       .finally(() => {
@@ -86,88 +91,81 @@ const SetupProfileScreen = () => {
     );
   }
   return (
-    <SafeAreaView className="flex-1 py-4 px-3 bg-bg">
-      <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
-        Setup Profile
-      </Text>
-      <View className="mt-3 flex-1">
-        <View className="mx-auto h-20 w-20 rounded-full justify-center items-center bg-gray-400">
-          <Entypo name="camera" size={26} color="black" />
-          <View className="absolute -bottom-3 flex-row justify-center z-40 ">
-            <TouchableOpacity
-              className="bg-black h-6 w-6 rounded-full items-center justify-center  "
-              onPress={pickImage}
-            >
-              <Entypo name="plus" size={16} color="#F7A600" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View className="mt-12">
-          <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            Full Name*
-          </Text>
-          <TextInput
-            placeholder="Full Name*"
-            className=" py-2 px-2 bg-white rounded-md mt-2 text-black"
-            style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-            onChangeText={(text) => setName(text)}
-            ref={nameInput}
-          />
-        </View>
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <SafeAreaView className="flex-1 py-4 px-3 bg-bg">
+        <ErrorModal visiblity={isFail} />
 
-        <View className="mt-4 ">
-          <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            Email*
-          </Text>
-          <TextInput
-            className="py-2 px-2 bg-white rounded-md mt-2"
-            style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-            placeholder="Email*"
-            onChangeText={(text) => setEmail(text)}
-            ref={emailInput}
-          />
-        </View>
-        <View className="mt-4 ">
-          <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            Address
-          </Text>
-          <View className="flex-row flex-wrap gap-4 mt-2">
+        <View className="mt-3 flex-1">
+          <View className="mt-6">
+            <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+              Full Name*
+            </Text>
             <TextInput
-              className=" py-2 px-2 bg-white rounded-md  w-1/3"
+              placeholder="Full Name*"
+              className=" py-2 px-2 bg-white rounded-md mt-2 text-black"
               style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-              placeholder="City"
-              onChangeText={(text) => setCity(text)}
-            />
-            <TextInput
-              className=" py-2 px-2 bg-white rounded-md  w-1/3"
-              style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-              placeholder="Region"
-              onChangeText={(text) => setRegion(text)}
-            />
-            <TextInput
-              className=" py-2 px-2 bg-white rounded-md w-1/3 "
-              style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-              placeholder="street "
-              onChangeText={(text) => setStreet(text)}
-            />
-            <TextInput
-              className=" py-2 px-2 bg-white rounded-md w-1/4   "
-              style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-              placeholder="Number"
-              onChangeText={(text) => setNumber(text)}
+              onChangeText={(text) => setName(text)}
+              ref={nameInput}
             />
           </View>
+
+          <View className="mt-4 ">
+            <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+              Email*
+            </Text>
+            <TextInput
+              className="py-2 px-2 bg-white rounded-md mt-2"
+              style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+              placeholder="Email*"
+              onChangeText={(text) => setEmail(text)}
+              ref={emailInput}
+            />
+          </View>
+          <View className="mt-4 ">
+            <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+              Address
+            </Text>
+            <View className="flex-row flex-wrap gap-4 mt-2">
+              <TextInput
+                className=" py-2 px-2 bg-white rounded-md  w-1/3"
+                style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                placeholder="City"
+                onChangeText={(text) => setCity(text)}
+              />
+              <TextInput
+                className=" py-2 px-2 bg-white rounded-md  w-1/3"
+                style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                placeholder="Region"
+                onChangeText={(text) => setRegion(text)}
+              />
+              <TextInput
+                className=" py-2 px-2 bg-white rounded-md w-1/3 "
+                style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                placeholder="street "
+                onChangeText={(text) => setStreet(text)}
+              />
+              <TextInput
+                className=" py-2 px-2 bg-white rounded-md w-1/4   "
+                style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                placeholder="Number"
+                onChangeText={(text) => setNumber(text)}
+              />
+            </View>
+          </View>
         </View>
-      </View>
-      <TouchableOpacity
-        className="bg-pr items-center py-3 rounded-md"
-        onPress={updateUser}
-      >
-        <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
-          Confirm
-        </Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+        <TouchableOpacity
+          className="bg-pr items-center py-3 rounded-md"
+          onPress={updateUser}
+        >
+          <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
+            Confirm
+          </Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

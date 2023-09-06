@@ -1,4 +1,4 @@
-import { View, Text, Alert, ScrollView } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import UserAddress from "../components/UserAddress";
@@ -25,6 +25,7 @@ import Error from "../components/Error";
 const HomeScreen = () => {
   const [showMap, setShowMap] = useState(false);
   const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
+  Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -80,7 +81,6 @@ const HomeScreen = () => {
 
   const getUserLocation = async () => {
     setAddressIsLoading(true);
-    Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -99,14 +99,26 @@ const HomeScreen = () => {
         }
       );
 
+      let streetNumber = "";
+      let street = "";
+      let region = "";
+      let city = "";
+
+      if (response[1]) {
+        streetNumber = response[1].streetNumber || "";
+        street = response[1].street || "";
+        region = response[1].region || "";
+        city = response[1].city || "";
+      }
+
       const address =
-        response[1].streetNumber +
+        streetNumber +
+        (streetNumber.length > 0 ? ", " : "") +
+        street +
+        (street.length > 0 ? ", " : "") +
+        region +
         ", " +
-        response[1].street +
-        ", " +
-        response[1].city +
-        ", " +
-        response[1].region;
+        city;
 
       dispatch(
         setUserAddress({

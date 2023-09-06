@@ -20,7 +20,8 @@ import Error from "../components/Error";
 
 const RewardsScreen = () => {
   const dispatch = useDispatch();
-  const { fidelity_points } = useSelector(selectUser);
+  const user = useSelector(selectUser);
+  const fidelity_points = user.fidelity_points || 0;
   const [rewards, setRewards] = useState([]);
   const [errors, setErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

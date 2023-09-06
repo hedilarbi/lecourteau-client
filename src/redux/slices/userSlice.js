@@ -29,9 +29,19 @@ export const userSlice = createSlice({
       };
     },
     clearUser: (state) => {
-      state.user = {};
-      state.address = {};
-      state.token = null;
+      return {
+        ...state,
+        user: {},
+        token: null,
+        address: {},
+      };
+    },
+    clearUserToken: (state) => {
+      return {
+        ...state,
+
+        token: null,
+      };
     },
     removeFromFidelityPoints: (state, action) => {
       return {
@@ -61,6 +71,7 @@ export const {
   removeFromFidelityPoints,
   clearUser,
   addToFidelityPoints,
+  clearUserToken,
 } = userSlice.actions;
 
 export const selectUser = (state) => state.user.user;

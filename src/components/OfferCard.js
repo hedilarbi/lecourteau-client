@@ -7,23 +7,18 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Fonts } from "../constants";
-import { Entypo, Feather } from "@expo/vector-icons";
+import { Entypo, Feather, AntDesign } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { removeOfferFromBasket } from "../redux/slices/basketSlice";
+import { useNavigation } from "@react-navigation/native";
 
-const OfferCard = ({
-  name,
-  id,
-  image,
-
-  price,
-  items,
-}) => {
+const OfferCard = ({ name, id, image, uid, price, items }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   const deleteItemFromCard = () => {
-    dispatch(removeOfferFromBasket({ id }));
+    dispatch(removeOfferFromBasket({ uid }));
   };
   return (
     <View className=" bg-white rounded-md px-3 py-2 mb-3">
@@ -37,9 +32,33 @@ const OfferCard = ({
               {name}
             </Text>
           </View>
-          <TouchableOpacity onPress={deleteItemFromCard}>
-            <Feather name="trash-2" size={20} color="#E34242" />
-          </TouchableOpacity>
+          <View className="flex-row items-center">
+            <TouchableOpacity
+              className="bg-black flex-row  items-center py-1 px-2"
+              onPress={() =>
+                navigation.navigate("Home", {
+                  screen: "Offer",
+                  params: {
+                    id,
+
+                    uid,
+                    parent: "Card",
+                  },
+                })
+              }
+            >
+              <Text
+                style={{ fontFamily: Fonts.LATO_REGULAR }}
+                className="text-white text-xs mr-3"
+              >
+                Customize
+              </Text>
+              <AntDesign name="arrowright" size={12} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={deleteItemFromCard} className="ml-2">
+              <Feather name="trash-2" size={20} color="#E34242" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View className="justify-between">
           <Text
@@ -57,7 +76,7 @@ const OfferCard = ({
               className="text-sm text-pr mr-2"
               style={{ fontFamily: Fonts.LATO_REGULAR }}
             >
-              View Items
+              View Details
             </Text>
             {showDetails ? (
               <Entypo name="chevron-thin-up" size={16} color="#F7A600" />

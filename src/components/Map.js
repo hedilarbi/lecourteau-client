@@ -19,8 +19,8 @@ const Map = ({ setShowMap }) => {
   const initialRegion = {
     latitude: location.latitude,
     longitude: location.longitude,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+    latitudeDelta: 0.02,
+    longitudeDelta: 0.02,
   };
 
   const handlePlaceSelect = async (data, details) => {
@@ -56,15 +56,28 @@ const Map = ({ setShowMap }) => {
         useGoogleMaps: true,
       }
     );
-    const address =
-      reverseGeocodeAddress[1].streetNumber +
-      ", " +
-      reverseGeocodeAddress[1].street +
-      ", " +
-      reverseGeocodeAddress[1].city +
-      ", " +
-      reverseGeocodeAddress[1].region;
+    // Initialize variables for each part of the address
+    let streetNumber = "";
+    let street = "";
+    let region = "";
+    let city = "";
 
+    // Check if reverseGeocodeAddress[1] exists and has streetNumber and street properties
+    if (reverseGeocodeAddress[1]) {
+      streetNumber = reverseGeocodeAddress[1].streetNumber || "";
+      street = reverseGeocodeAddress[1].street || "";
+      region = reverseGeocodeAddress[1].region || "";
+      city = reverseGeocodeAddress[1].city || "";
+    }
+
+    const address =
+      streetNumber +
+      (streetNumber.length > 0 ? ", " : "") +
+      street +
+      (street.length > 0 ? ", " : "") +
+      region +
+      ", " +
+      city;
     dispatch(
       setUserAddress({
         address: address,
@@ -109,6 +122,9 @@ const Map = ({ setShowMap }) => {
             latitude: location.latitude,
             longitude: location.longitude,
           }}
+          draggable
+          tappable
+          onDragEnd={(e) => handleMarkerPlace(e)}
         />
       </MapView>
       <View className="bg-white py-4 px-3">

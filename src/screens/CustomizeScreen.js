@@ -6,32 +6,39 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Fonts } from "../constants";
 import { Entypo } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
+
+import { Fonts } from "../constants";
 import {
   addToBasket,
   selectBasketItemWithUID,
-  selectBasketItemsWithID,
   updateItemInBasket,
 } from "../redux/slices/basketSlice";
 import { getMenuItem } from "../services/FoodServices";
 import Error from "../components/Error";
+import DropDown from "../components/DropDown";
+
 const CustomizeScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
   const navigation = useNavigation();
+
   const [refresh, setRefresh] = useState(0);
   const [errors, setErrors] = useState(false);
-  const [menuItem, setMenuItem] = useState([]);
+  const [menuItem, setMenuItem] = useState(null);
   const [categorizedCustomization, setCategorizedCustomization] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  let itemFromBasket = null;
-  if (route.params.parent === "Card") {
-    itemFromBasket = useSelector(selectBasketItemWithUID(route.params.uid));
-  }
+  const [size, setSize] = useState("");
+  const [sizes, setSizes] = useState([]);
+  const [price, setPrice] = useState("");
+
+  const itemFromBasket =
+    route.params.parent === "Card"
+      ? useSelector(selectBasketItemWithUID(route.params.uid))
+      : null;
 
   useEffect(() => {
     setErrors(false);
@@ -70,6 +77,15 @@ const CustomizeScreen = () => {
           });
 
           setCategorizedCustomization(CustomizationList);
+          const list = response.data.prices.map((item) => item.size);
+          setSizes(list);
+          if (route.params.parent === "Card") {
+            setPrice(itemFromBasket[0].price);
+            setSize(itemFromBasket[0].size);
+          } else {
+            setPrice(response.data.prices[0].price);
+            setSize(response.data.prices[0].size);
+          }
           setMenuItem(response?.data);
         } else {
           setErrors(true);
@@ -80,39 +96,50 @@ const CustomizeScreen = () => {
       });
   }, [refresh]);
 
+  useEffect(() => {
+    if (menuItem) {
+      const selectedItem = menuItem?.prices?.find((item) => item.size === size);
+      setPrice(selectedItem?.price);
+    }
+  }, [size]);
+
+  const calculateTotalPrice = () => {
+    let newPrice = price;
+    selectedItems.map((item) => (newPrice += item.price));
+
+    return newPrice;
+  };
+
+  const selectedItems = useMemo(() => {
+    return Object.keys(categorizedCustomization).reduce((result, category) => {
+      const elements = categorizedCustomization[category];
+      const selectedItems = elements.filter(
+        (element) => element.state === true
+      );
+      return [...result, ...selectedItems];
+    }, []);
+  }, [categorizedCustomization]);
+
   const addItemToBasket = () => {
-    const selectedItems = Object.keys(categorizedCustomization).reduce(
-      (result, category) => {
-        const elements = categorizedCustomization[category];
-        const selectedItems = elements.filter(
-          (element) => element.state === true
-        );
-        return [...result, ...selectedItems];
-      },
-      []
-    );
     if (route.params.parent === "Menu") {
-      let newPrice = route.params.price;
-      selectedItems.map((item) => (newPrice += item.price));
       dispatch(
         addToBasket({
           id: menuItem._id,
           name: menuItem.name,
           image: menuItem.image,
-          price: newPrice,
-          size: route.params.size,
+          price: calculateTotalPrice(),
+          size: size,
           customization: selectedItems,
         })
       );
 
       navigation.goBack();
     } else {
-      let newPrice = route.params.price;
-      selectedItems.map((item) => (newPrice += item.price));
       dispatch(
         updateItemInBasket({
           uid: route.params.uid,
-          price: newPrice,
+          price: calculateTotalPrice(),
+          size,
           customization: selectedItems,
         })
       );
@@ -133,8 +160,6 @@ const CustomizeScreen = () => {
 
       if (elementIndex !== -1) {
         categoryArray[elementIndex].state = !categoryArray[elementIndex].state;
-      } else {
-        console.error("Element not found!");
       }
 
       return updatedState;
@@ -153,26 +178,51 @@ const CustomizeScreen = () => {
   }
   return (
     <View className="flex-1 bg-bg">
-      <View className=" h-44 bg-gray-400">
-        <Image
-          source={{ uri: menuItem.image }}
-          className="flex-1"
-          style={{ resizeMode: "cover" }}
-        />
-      </View>
-      <Text
-        style={{ fontFamily: Fonts.LATO_BOLD }}
-        className="px-3 mt-3 text-base"
-      >
-        {menuItem.name}
-      </Text>
-      <ScrollView className="flex-1 p-3">
+      <ScrollView className="flex-1 ">
+        <View className=" h-44 bg-gray-400">
+          <Image
+            source={{ uri: menuItem.image }}
+            className="flex-1"
+            style={{ resizeMode: "cover" }}
+          />
+          {/* <View className=" absolute bottom-4 left-0 flex-row items-center  px-3 border">
+            <Text
+              style={{ fontFamily: Fonts.BEBAS_NEUE }}
+              className=" text-2xl text-pr"
+            >
+              {menuItem.name} :
+              <Text
+                style={{ fontFamily: Fonts.LATO_REGULAR }}
+                className="text-sm text-gray-500"
+              >
+                {menuItem.description}
+              </Text>
+            </Text>
+          </View> */}
+        </View>
+
+        <View className="flex-row items-center mt-3 px-3">
+          <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-base">
+            Choose Size
+          </Text>
+          <View className="ml-3  bg-white border-pr rounded-md">
+            <DropDown size={size} setSize={setSize} sizes={sizes} />
+          </View>
+        </View>
+
+        <Text
+          style={{ fontFamily: Fonts.BEBAS_NEUE }}
+          className="text-base mt-3 px-3"
+        >
+          Customization
+        </Text>
+
         {Object.entries(categorizedCustomization).map(([key, toppings]) => {
           return (
-            <View key={key}>
+            <View key={key} className="mt-2 px-3">
               <Text
-                style={{ fontFamily: Fonts.BEBAS_NEUE }}
-                className="text-base"
+                style={{ fontFamily: Fonts.LATO_BOLD }}
+                className="text-sm capitalize"
               >
                 {key}
               </Text>
@@ -236,8 +286,20 @@ const CustomizeScreen = () => {
         })}
       </ScrollView>
 
+      <View className="px-3 my-3 flex-row justify-between items-center">
+        <Text className="text-base" style={{ fontFamily: Fonts.LATO_BOLD }}>
+          Price
+        </Text>
+        <Text
+          style={{ fontFamily: Fonts.LATO_BOLD }}
+          className="text-sm text-gray-500  "
+        >
+          {calculateTotalPrice()} $
+        </Text>
+      </View>
+
       <TouchableOpacity
-        className="bg-pr rounded-md items-center justify-center py-3 mx-3 mb-4"
+        className="bg-pr rounded-md items-center justify-center py-2 mx-3 mb-4"
         onPress={addItemToBasket}
       >
         <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
