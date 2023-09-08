@@ -18,6 +18,7 @@ const OrderDetailsScreen = () => {
   const { id } = route.params;
   const [refresh, setRefresh] = useState(0);
   const [errors, setErrors] = useState(false);
+
   const fetchData = async () => {
     setErrors(false);
     setIsLoading(true);
@@ -213,8 +214,8 @@ const OrderDetailsScreen = () => {
           </Text>
         </>
       )}
-      <View className="bg-white p-2 rounded-md mt-3">
-        <View className="flex-row justify-between">
+      <View className="bg-white p-4 rounded-md mt-3 ">
+        <View className="flex-row justify-between border-b border-gray-300 pb-3">
           <Text
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             className="text-sm text-tgry"
@@ -225,7 +226,7 @@ const OrderDetailsScreen = () => {
             {order.sub_total}$
           </Text>
         </View>
-        <View className="flex-row justify-between my-3 border-b pb-3 border-gray-300">
+        <View className="flex-row justify-between my-1 border-b pb-3 border-gray-300">
           <Text
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             className="text-sm text-tgry"
@@ -234,6 +235,28 @@ const OrderDetailsScreen = () => {
           </Text>
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
             {order.delivery_fee}$
+          </Text>
+        </View>
+        <View className="flex-row justify-between my-1 border-b pb-3 border-gray-300">
+          <Text
+            style={{ fontFamily: Fonts.LATO_REGULAR }}
+            className="text-sm text-tgry"
+          >
+            TPS
+          </Text>
+          <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+            {((order.sub_total * 5) / 100).toFixed(2)}$
+          </Text>
+        </View>
+        <View className="flex-row justify-between my-1 border-b pb-3 border-gray-300">
+          <Text
+            style={{ fontFamily: Fonts.LATO_REGULAR }}
+            className="text-sm text-tgry"
+          >
+            TVQ
+          </Text>
+          <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+            {((order.sub_total * 9.975) / 100).toFixed(2)}$
           </Text>
         </View>
         <View className="flex-row justify-between">
@@ -248,9 +271,9 @@ const OrderDetailsScreen = () => {
           </Text>
         </View>
       </View>
-      <TouchableOpacity className="">
+      {/* <TouchableOpacity className="">
         <Text>Cancel</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </ScrollView>
   );
 };

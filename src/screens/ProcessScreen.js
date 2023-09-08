@@ -9,7 +9,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { clearBasket } from "../redux/slices/basketSlice";
 import { setUser } from "../redux/slices/userSlice";
 import { Fonts } from "../constants";
-import FullLogoBlack from "../../assets/icons/FullLogoBlack.svg";
+import FullLogo from "../../assets/icons/FullLogo.svg";
 import SuccessModel from "../components/SuccessModel";
 const ProcessScreen = () => {
   const order = useSelector(selectOrder);
@@ -28,6 +28,7 @@ const ProcessScreen = () => {
           dispatch(setUser(response.data));
         } else {
           setError(true);
+          console.log(response);
         }
       })
       .finally(() => {});
@@ -52,10 +53,10 @@ const ProcessScreen = () => {
     }
   }, [showSuccessModel]);
   return (
-    <SafeAreaView className="bg-pr justify-center items-center flex-1">
+    <SafeAreaView className="bg-black justify-center items-center flex-1">
       <SuccessModel visiblity={showSuccessModel} />
       <View className="items-center">
-        <FullLogoBlack />
+        <FullLogo />
         {error ? (
           <View className="mt-3">
             <Text
@@ -88,10 +89,6 @@ const ProcessScreen = () => {
       </View>
     </SafeAreaView>
   );
-};
-
-ProcessScreen.navigationOptions = {
-  tabBarVisible: false, // This will hide the bottom tab bar
 };
 
 export default ProcessScreen;

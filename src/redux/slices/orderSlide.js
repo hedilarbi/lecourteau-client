@@ -17,6 +17,10 @@ export const orderSlice = createSlice({
         address: action.payload.address,
         type: action.payload.type,
         coords: action.payload.coords,
+        order: {
+          ...state.order,
+          total: action.payload.total,
+        },
       };
     },
   },

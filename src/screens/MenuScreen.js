@@ -121,6 +121,7 @@ const MenuScreen = ({ navigation }) => {
             description={item.description}
             prices={item.prices}
             key={item._id}
+            is_available={item.is_available}
           />
         )}
         keyExtractor={(item) => item._id}

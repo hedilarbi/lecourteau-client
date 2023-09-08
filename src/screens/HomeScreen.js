@@ -14,13 +14,19 @@ import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { getCategories, getOffers } from "../services/FoodServices";
 import { API_URL } from "@env";
-import { selectUserAddress, setUserAddress } from "../redux/slices/userSlice";
+import {
+  selectUser,
+  selectUserAddress,
+  setUserAddress,
+} from "../redux/slices/userSlice";
 import { getRestaurantSettings } from "../services/RestaurantServices";
 import WarningBanner from "../components/WarningBanner";
 import { setSettings } from "../redux/slices/settingsSlice";
 import Map from "../components/Map";
 import { ActivityIndicator } from "react-native";
 import Error from "../components/Error";
+import { registerForPushNotificationsAsync } from "../services/NotificationsServices";
+import { updateUserExpoToken } from "../services/UserServices";
 
 const HomeScreen = () => {
   const [showMap, setShowMap] = useState(false);
@@ -37,6 +43,17 @@ const HomeScreen = () => {
   const [addressIsLoading, setAddressIsLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
   const [errors, setErrors] = useState(false);
+  const user = useSelector(selectUser);
+
+  useEffect(() => {
+    if (Object.keys(user).length !== 0 && !user.expo_token) {
+      registerForPushNotificationsAsync().then(async (token) =>
+        updateUserExpoToken(user._id, token.data).then((response) => {
+          console.log(response);
+        })
+      );
+    }
+  }, []);
 
   const fetchData = async () => {
     setIsLoading(true);

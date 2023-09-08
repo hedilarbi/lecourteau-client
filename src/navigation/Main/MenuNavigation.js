@@ -8,6 +8,7 @@ import PaiementScreen from "../../screens/PaiementScreen";
 import ProcessScreen from "../../screens/ProcessScreen";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { Fonts } from "../../constants";
+import SetAddressScreen from "../../screens/SetAddressScreen";
 const MenuNavigation = () => {
   const MenuStack = createNativeStackNavigator();
 
@@ -24,7 +25,7 @@ const MenuNavigation = () => {
         name="Card"
         component={CardScreen}
         options={({ navigation }) => ({
-          title: "Card", // Optional: You can set a custom title
+          title: "Cart", // Optional: You can set a custom title
 
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
@@ -40,6 +41,13 @@ const MenuNavigation = () => {
             />
           ),
         })}
+      />
+      <MenuStack.Screen
+        name="SetAddress"
+        component={SetAddressScreen}
+        options={{
+          headerShown: false,
+        }}
       />
       <MenuStack.Screen
         name="Customize"

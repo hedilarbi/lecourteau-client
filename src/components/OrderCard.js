@@ -9,13 +9,33 @@ const OrderCard = ({ status, createdAt, total, id }) => {
   date = date.toString("fr-FR", { month: "long" });
   date = date.substr(4, 17);
 
+  const handleOrderStatusColor = (status) => {
+    switch (status) {
+      case "Done":
+        return "#2AB2DB";
+
+      case "On Going":
+        return "#F3A32B";
+      case "Canceled":
+        return "#FF0707";
+      case "On Delivery":
+        return "#2AED49";
+    }
+  };
+
   return (
     <TouchableOpacity
       className="bg-white rounded-md p-4 mb-3"
       onPress={() => navigation.navigate("Details", { id: id })}
     >
       <View className="flex-row justify-between border-b border-gray-300 pb-4">
-        <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+        <Text
+          style={{
+            fontFamily: Fonts.LATO_BOLD,
+            fontSize: 14,
+            color: handleOrderStatusColor(status),
+          }}
+        >
           {status}
         </Text>
         <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>

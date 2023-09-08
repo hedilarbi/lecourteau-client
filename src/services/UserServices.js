@@ -78,6 +78,31 @@ const addToFavorites = async (userId, itemId) => {
     };
   }
 };
+const addToAddresses = async (userId, address, coords) => {
+  try {
+    let addToAddressesResponse = await axios.put(
+      `${API_URL}/users/addresses/update/add/${userId}`,
+      { address, coords }
+    );
+    if (addToAddressesResponse?.status === 200) {
+      return {
+        status: true,
+        message: "Address added",
+        data: addToAddressesResponse?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't add",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
 const removeFromFavorites = async (userId, itemId) => {
   try {
     let removeFromFavoritesResponse = await axios.put(
@@ -135,12 +160,13 @@ const getUserByToken = async (token) => {
   }
 };
 
-const setUserInfo = async (id, name, email, address) => {
+const setUserInfo = async (id, name, email, address, coords) => {
   try {
     let updateUserInfoResponse = await axios.put(`${API_URL}/users/set/${id}`, {
       name,
       email,
       address,
+      coords,
     });
     if (updateUserInfoResponse.status === 200) {
       return {
@@ -283,4 +309,5 @@ export {
   setUserInfo,
   deleteUser,
   updateUserExpoToken,
+  addToAddresses,
 };

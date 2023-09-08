@@ -32,7 +32,9 @@ const CheckoutScreen = () => {
 
   const { delivery_fee } = useSelector(selectSettings);
   const subTotal = useSelector(selectBasketTotal);
-  const total = delivery_fee + parseFloat(subTotal);
+  const tps = (subTotal * 5) / 100;
+  const tvq = (subTotal * 9.975) / 100;
+  const total = delivery_fee + parseFloat(subTotal) + tps + tvq;
   const dispatch = useDispatch();
   const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
   const [deliveryMode, setDeliveryMode] = useState("delivery");
@@ -42,14 +44,18 @@ const CheckoutScreen = () => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
-
   const navigation = useNavigation();
 
   const editOrder = () => {};
 
   const processOrder = () => {
     dispatch(
-      setOrderTypeAndAddress({ type: deliveryMode, address, coords: location })
+      setOrderTypeAndAddress({
+        type: deliveryMode,
+        address,
+        coords: location,
+        total: total.toFixed(2),
+      })
     );
     navigation.navigate("Process");
   };
@@ -176,10 +182,21 @@ const CheckoutScreen = () => {
                 style={{ fontFamily: Fonts.LATO_REGULAR }}
                 className="text-sm text-tgry"
               >
-                TVA
+                TVQ
               </Text>
               <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
-                ????
+                {tvq.toFixed(2)} $
+              </Text>
+            </View>
+            <View className="flex-row justify-between my-1 border-b pb-1 border-gray-300">
+              <Text
+                style={{ fontFamily: Fonts.LATO_REGULAR }}
+                className="text-sm text-tgry"
+              >
+                TPS
+              </Text>
+              <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+                {tps.toFixed(2)} $
               </Text>
             </View>
             <View className="flex-row justify-between">

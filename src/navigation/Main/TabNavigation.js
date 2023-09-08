@@ -65,11 +65,6 @@ const TabNavigation = () => {
 
   return (
     <>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="black"
-        translucent={false}
-      />
       <MainTab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused }) => {

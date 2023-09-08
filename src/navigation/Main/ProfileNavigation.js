@@ -8,6 +8,7 @@ import CompleteProfileScreen from "../../screens/CompleteProfileScreen";
 import OrderDetailsScreen from "../../screens/OrderDetailsScreen";
 import { Fonts } from "../../constants";
 import { HeaderBackButton } from "@react-navigation/elements";
+import SetAddressScreen from "../../screens/SetAddressScreen";
 const MenuNavigation = () => {
   const ProfileStack = createNativeStackNavigator();
 
@@ -67,6 +68,13 @@ const MenuNavigation = () => {
         }}
       />
       <ProfileStack.Screen
+        name="SetAddress"
+        component={SetAddressScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <ProfileStack.Screen
         name="CompleteProfile"
         component={CompleteProfileScreen}
         options={{
@@ -81,7 +89,7 @@ const MenuNavigation = () => {
         name="Details"
         component={OrderDetailsScreen}
         options={({ navigation }) => ({
-          title: "Card", // Optional: You can set a custom title
+          title: "Order Details", // Optional: You can set a custom title
 
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,

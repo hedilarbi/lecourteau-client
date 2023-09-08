@@ -97,7 +97,7 @@ const CardScreen = () => {
         user_id: user._id,
         orderItems,
         subTotal,
-        total,
+
         offers: orderOffers,
         rewards: orderRewards,
         deliveryFee: delivery_fee,

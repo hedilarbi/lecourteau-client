@@ -11,10 +11,10 @@ import {
   setUser,
   setUserToken,
 } from "../redux/slices/userSlice";
-import { getItemAsync } from "expo-secure-store";
+import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import SetupProfileScreen from "../screens/SetupProfileScreen";
 import * as SplashScreen from "expo-splash-screen";
-import { Alert } from "react-native";
+import { Alert, StatusBar } from "react-native";
 
 const RootNavigation = () => {
   const RootStack = createNativeStackNavigator();
@@ -31,12 +31,12 @@ const RootNavigation = () => {
     }
     if (token) {
       getUserByToken(token)
-        .then((response) => {
+        .then(async (response) => {
           if (response.status) {
             dispatch(setUser(response.data));
             dispatch(setUserToken(token));
           } else {
-            Alert.alert("Something Went wrong");
+            await deleteItemAsync("token");
           }
         })
         .finally(async () => {
@@ -55,6 +55,11 @@ const RootNavigation = () => {
 
   return (
     <>
+      <StatusBar
+        barStyle="light-content"
+        translucent={false}
+        backgroundColor="black"
+      />
       <NavigationContainer>
         <RootStack.Navigator>
           {!userToken && (

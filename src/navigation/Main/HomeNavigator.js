@@ -11,16 +11,6 @@ import { useEffect } from "react";
 import { updateUserExpoToken } from "../../services/UserServices";
 const HomeNavigation = () => {
   const MenuStack = createNativeStackNavigator();
-  const user = useSelector(selectUser);
-  useEffect(() => {
-    if (user && !user.expo_token) {
-      registerForPushNotificationsAsync().then(async (token) =>
-        updateUserExpoToken(user._id, token.data).then((response) => {
-          console.log(response);
-        })
-      );
-    }
-  }, []);
 
   return (
     <MenuStack.Navigator>
