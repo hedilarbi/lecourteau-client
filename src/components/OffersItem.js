@@ -1,4 +1,3 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { Image } from "react-native";
 import { TouchableOpacity } from "react-native";

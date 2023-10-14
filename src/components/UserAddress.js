@@ -6,14 +6,14 @@ import { Fonts } from "../constants";
 import { useSelector } from "react-redux";
 import { selectUserAddress } from "../redux/slices/userSlice";
 
-const UserAddress = ({ setShowMap }) => {
+const UserAddress = ({ setShowMap, text }) => {
   const { address } = useSelector(selectUserAddress);
 
   return (
     <View className="bg-white rounded-md px-4 py-2 flex-row flex  items-center ">
       <View className="flex-1">
         <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
-          Your current location
+          {text}
         </Text>
         <Text
           style={{ fontFamily: Fonts.LATO_REGULAR }}

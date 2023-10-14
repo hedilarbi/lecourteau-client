@@ -25,6 +25,20 @@ import WarningModel from "../components/WarningModel";
 import { restaurantOpenStatus } from "../utils/restaurantOpenStatus";
 import RestaurantCloseModal from "../components/RestaurantCloseModal";
 
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import CartFr from "../translation/fr/Cart";
+import CartEn from "../translation/en/Cart";
+
+const translation = {
+  en: CartEn,
+  fr: CartFr,
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
+
 const CardScreen = () => {
   const basket = useSelector(selectBasket);
 
@@ -116,10 +130,18 @@ const CardScreen = () => {
       <WarningModel
         setShowWarningModel={setShowWarningModel}
         showWarningModel={showWarningModel}
+        text={{
+          warning: i18n.t("warning_text"),
+          button: i18n.t("warning_button"),
+        }}
       />
       <RestaurantCloseModal
         showRestaurantCloseModal={showRestaurantCloseModal}
         setShowRestaurantCloseModal={setShowRestaurantCloseModal}
+        text={{
+          warning: i18n.t("close_warning"),
+          button: i18n.t("close_button"),
+        }}
       />
       {(basketItems?.length ||
         basketOffers.length > 0 ||
@@ -138,7 +160,7 @@ const CardScreen = () => {
                     style={{ fontFamily: Fonts.LATO_REGULAR }}
                     className="text-sm text-tgry mb-2"
                   >
-                    Items
+                    {i18n.t("items")}
                   </Text>
                   {basketItems.map((item, index) => (
                     <CardMenuItem
@@ -160,7 +182,7 @@ const CardScreen = () => {
                     style={{ fontFamily: Fonts.LATO_REGULAR }}
                     className="text-sm text-tgry mb-2"
                   >
-                    Offers
+                    {i18n.t("offers")}
                   </Text>
                   {basketOffers.map((item, index) => (
                     <OfferCard
@@ -182,7 +204,7 @@ const CardScreen = () => {
                     style={{ fontFamily: Fonts.LATO_REGULAR }}
                     className="text-sm text-tgry mb-2"
                   >
-                    Rewards
+                    {i18n.t("rewards")}
                   </Text>
                   {basketRewards.map((item, index) => (
                     <RewardCard
@@ -205,7 +227,7 @@ const CardScreen = () => {
                 color="#F7A600"
               />
               <TextInput
-                placeholder="Add Delivery Instructions (Optional)"
+                placeholder={i18n.t("delivery_instructions_placeholder")}
                 placeholderTextColor="#857878"
                 style={{ fontFamily: Fonts.LATO_REGULAR }}
                 className="ml-3 flex-1"
@@ -221,7 +243,7 @@ const CardScreen = () => {
                 style={{ fontFamily: Fonts.LATO_REGULAR }}
                 className="text-sm text-tgry"
               >
-                Total
+                {i18n.t("total_text")}
               </Text>
               <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
                 {total.toFixed(2)}$
@@ -233,7 +255,7 @@ const CardScreen = () => {
             onPress={checkout}
           >
             <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
-              Checkout
+              {i18n.t("checkout_button")}
             </Text>
           </TouchableOpacity>
         </View>

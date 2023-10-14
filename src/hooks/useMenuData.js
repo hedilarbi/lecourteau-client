@@ -22,6 +22,7 @@ const useMenuData = (setIsLoading, refresh) => {
       if (categoriesNamesResponse.status) {
         setMenuCategories([
           { _id: "0", name: "All" },
+          { _id: "1", name: "Favorites" },
           ...categoriesNamesResponse.data,
         ]);
       } else {

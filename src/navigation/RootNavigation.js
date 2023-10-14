@@ -15,6 +15,7 @@ import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import SetupProfileScreen from "../screens/SetupProfileScreen";
 import * as SplashScreen from "expo-splash-screen";
 import { Alert, StatusBar } from "react-native";
+import AuthNavigation from "./Auth/AuthNavigation";
 
 const RootNavigation = () => {
   const RootStack = createNativeStackNavigator();
@@ -37,6 +38,8 @@ const RootNavigation = () => {
             dispatch(setUserToken(token));
           } else {
             await deleteItemAsync("token");
+            dispatch(setUser({}));
+            dispatch(setUserToken(null));
           }
         })
         .finally(async () => {
@@ -64,8 +67,8 @@ const RootNavigation = () => {
         <RootStack.Navigator>
           {!userToken && (
             <RootStack.Screen
-              name="SignUp"
-              component={SignUpScreen}
+              name="Auth"
+              component={AuthNavigation}
               options={{
                 headerShown: false,
               }}

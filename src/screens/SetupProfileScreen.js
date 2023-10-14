@@ -5,35 +5,64 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { I18n } from "i18n-js";
 import { useDispatch, useSelector } from "react-redux";
-import { ActivityIndicator } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Localization from "expo-localization";
 import * as Location from "expo-location";
 
+import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Fonts } from "../constants/";
 import { selectUser, setUser } from "../redux/slices/userSlice";
 import { setUserInfo } from "../services/UserServices";
 import ErrorModal from "../components/ErrorModal";
 import { emailValidator } from "../utils/Validators";
+import { formatDate } from "../utils/dateHandlers";
+import { selectAuthData } from "../redux/slices/authSlice";
+import SetupFr from "../translation/fr/SetupProfile";
+import SetupEn from "../translation/en/SetupProfile";
+
+const translation = {
+  en: SetupEn,
+  fr: SetupFr,
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const SetupProfileScreen = () => {
-  const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
-
   const dispatch = useDispatch();
+
+  const authData = useSelector(selectAuthData);
+  const { _id } = useSelector(selectUser);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [coords, setCoords] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isFail, setIsFail] = useState(false);
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [date, setDate] = useState(new Date("2015-1-1"));
 
   const nameInput = useRef(null);
   const emailInput = useRef(null);
 
-  const { _id } = useSelector(selectUser);
+  useEffect(() => {
+    if (authData.name) {
+      setName(authData.name);
+    }
+    if (authData.email) {
+      setEmail(authData.email);
+    }
+  }, []);
 
   useEffect(() => {
     if (isFail) {
@@ -84,7 +113,7 @@ const SetupProfileScreen = () => {
 
     setIsLoading(true);
 
-    setUserInfo(_id, name, email, address, coords)
+    setUserInfo(_id, name, email, address, coords, date)
       .then((response) => {
         if (response.status) {
           dispatch(setUser(response.data));
@@ -96,6 +125,25 @@ const SetupProfileScreen = () => {
       .finally(() => {
         setIsLoading(false);
       });
+  };
+
+  const onChangeDate = ({ type }, selectedDate) => {
+    if (type == "set") {
+      setDate(selectedDate);
+
+      if (Platform.OS == "android") {
+        setShowDatePicker(false);
+
+        setDateOfBirth(formatDate(selectedDate));
+      }
+    } else {
+      setShowDatePicker(false);
+    }
+  };
+
+  const confirmIOSDate = () => {
+    setDateOfBirth(formatDate(date));
+    setShowDatePicker(false);
   };
 
   if (isLoading) {
@@ -116,36 +164,92 @@ const SetupProfileScreen = () => {
 
         <View className="mt-3 flex-1">
           <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-xl">
-            Setup Profile
+            {i18n.t("setup_profile_title")}
           </Text>
-          <View className="mt-6">
-            <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-              Full Name*
-            </Text>
-            <TextInput
-              placeholder="Full Name*"
-              className=" py-2 px-2 bg-white rounded-md mt-2 text-black"
-              style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-              onChangeText={(text) => setName(text)}
-              ref={nameInput}
-            />
-          </View>
+          {!authData.method && (
+            <>
+              <View className="mt-6">
+                <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+                  {i18n.t("full_name")}
+                </Text>
+                <TextInput
+                  placeholder="Full Name*"
+                  className=" py-2 px-2 bg-white rounded-md mt-2 text-black"
+                  style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                  onChangeText={(text) => setName(text)}
+                  ref={nameInput}
+                />
+              </View>
+              <View className="mt-4 ">
+                <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+                  {i18n.t("email")}
+                </Text>
+                <TextInput
+                  className="py-2 px-2 bg-white rounded-md mt-2"
+                  style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                  placeholder="Email*"
+                  onChangeText={(text) => setEmail(text)}
+                  ref={emailInput}
+                />
+              </View>
+            </>
+          )}
 
           <View className="mt-4 ">
             <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-              Email*
+              {i18n.t("date_of_birth")}
             </Text>
-            <TextInput
-              className="py-2 px-2 bg-white rounded-md mt-2"
-              style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-              placeholder="Email*"
-              onChangeText={(text) => setEmail(text)}
-              ref={emailInput}
-            />
+            {showDatePicker && (
+              <DateTimePicker
+                mode="date"
+                display="spinner"
+                value={date}
+                onChange={onChangeDate}
+                style={{ height: 120, marginTop: -10 }}
+                maximumDate={new Date("2015-1-1")}
+              />
+            )}
+            {showDatePicker && Platform.OS == "ios" && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-around ",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(false)}
+                  className="bg-gray-400 rounded-md items-center px-4 py-2"
+                >
+                  <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+                    {i18n.t("cancel")}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={confirmIOSDate}
+                  className="bg-pr rounded-md items-center px-4 py-2"
+                >
+                  <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+                    {i18n.t("confirm")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {!showDatePicker && (
+              <Pressable onPress={() => setShowDatePicker(true)}>
+                <TextInput
+                  className="py-2 px-2 bg-white rounded-md mt-2 text-black"
+                  style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                  placeholder="25 / 10 / 1999"
+                  value={dateOfBirth}
+                  editable={false}
+                  onPressIn={() => setShowDatePicker(true)}
+                />
+              </Pressable>
+            )}
           </View>
           <View className="mt-4 flex-1">
             <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-              Address
+              {i18n.t("address")}
             </Text>
             <View className="bg-white rounded-md flex-row items-center  mt-2">
               <GooglePlacesAutocomplete
@@ -164,7 +268,7 @@ const SetupProfileScreen = () => {
           onPress={updateUser}
         >
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
-            Confirm
+            {i18n.t("confirm_button")}
           </Text>
         </TouchableOpacity>
       </View>

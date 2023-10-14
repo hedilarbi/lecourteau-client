@@ -5,12 +5,12 @@ import { FlatList } from "react-native";
 
 import NewsItem from "./NewsItem";
 
-const News = memo(() => {
+const News = memo(({ text }) => {
   return (
     <>
       <View className="mt-4">
         <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-lg">
-          what's new
+          {text.title}
         </Text>
         <View className="bg-pr h-0.5 w-8 "></View>
       </View>

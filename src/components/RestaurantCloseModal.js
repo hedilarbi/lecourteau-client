@@ -6,6 +6,7 @@ import { Fonts } from "../constants";
 const RestaurantCloseModal = ({
   showRestaurantCloseModal,
   setShowRestaurantCloseModal,
+  text,
 }) => {
   return (
     <Modal
@@ -37,7 +38,7 @@ const RestaurantCloseModal = ({
                 textAlign: "center",
               }}
             >
-              We are sorry, but we are close for now. Come back tomorrow please!
+              {text.warning}
             </Text>
             <View className="flex-row justify-center ">
               <TouchableOpacity
@@ -45,7 +46,7 @@ const RestaurantCloseModal = ({
                 onPress={() => setShowRestaurantCloseModal(false)}
               >
                 <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-                  Close
+                  {text.button}
                 </Text>
               </TouchableOpacity>
             </View>

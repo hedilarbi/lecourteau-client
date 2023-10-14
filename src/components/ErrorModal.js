@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, View } from "react-native";
+import { Modal, View } from "react-native";
 import React from "react";
 import { AntDesign } from "@expo/vector-icons";
 

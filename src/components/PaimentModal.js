@@ -3,20 +3,15 @@ import React from "react";
 import { Modal } from "react-native";
 import { Dimensions } from "react-native";
 import { Fonts } from "../constants";
-import {
-  MaterialCommunityIcons,
-  MaterialIcons,
-  Ionicons,
-  Feather,
-  AntDesign,
-  Entypo,
-} from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
+import StripePaymentForm from "./StripePaymentForm";
 
-const PaimentModal = ({ isModalVisible, setModalVisible }) => {
+const PaimentModal = ({ isModalVisible, setModalVisible, setCardDetails }) => {
   const selectCard = () => {
     setModalVisible(false);
   };
+
   return (
     <Modal
       animationType="slide"
@@ -28,7 +23,7 @@ const PaimentModal = ({ isModalVisible, setModalVisible }) => {
         style={{
           flex: 1,
           justifyContent: "flex-end",
-          backgroundColor: "rgba(0, 0, 0, 0.1)",
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
         }}
       >
         <View
@@ -39,25 +34,30 @@ const PaimentModal = ({ isModalVisible, setModalVisible }) => {
           }}
           className="bg-bg pb-3"
         >
-          <View className="bg-white rounded-t-2xl p-3">
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)} // Close the modal
-            >
-              <AntDesign name="close" size={28} color="black" />
-            </TouchableOpacity>
+          <View className="bg-white rounded-t-2xl ">
+            <View className="px-3 my-3 flex-row items-center  justify-between ">
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)} // Close the modal
+              >
+                <AntDesign name="close" size={28} color="black" />
+              </TouchableOpacity>
 
-            <Text
-              style={{
-                fontFamily: Fonts.LATO_BOLD,
-                fontSize: 18,
-                marginTop: 12,
-              }}
-            >
-              Select payment card
-            </Text>
+              <Text
+                style={{
+                  fontFamily: Fonts.LATO_BOLD,
+                  fontSize: 18,
+                }}
+              >
+                Payment Details
+              </Text>
+              <View>
+                <AntDesign name="close" size={28} color="white" />
+              </View>
+            </View>
           </View>
 
-          <View className="flex-1">
+          <StripePaymentForm setCardDetails={setCardDetails} />
+          {/* <View className="flex-1">
             <TouchableOpacity className="bg-white px-3 flex-row justify-between items-center mt-2 py-3">
               <Text
                 style={{
@@ -69,13 +69,13 @@ const PaimentModal = ({ isModalVisible, setModalVisible }) => {
               </Text>
               <Entypo name="plus" size={18} color="black" />
             </TouchableOpacity>
-          </View>
+          </View> */}
           <TouchableOpacity
             className="bg-pr rounded-md items-center justify-center py-2  mx-2"
             onPress={selectCard}
           >
             <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
-              Select
+              Confirm
             </Text>
           </TouchableOpacity>
         </View>

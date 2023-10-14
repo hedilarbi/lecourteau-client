@@ -9,6 +9,32 @@ import OrderDetailsScreen from "../../screens/OrderDetailsScreen";
 import { Fonts } from "../../constants";
 import { HeaderBackButton } from "@react-navigation/elements";
 import SetAddressScreen from "../../screens/SetAddressScreen";
+
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    my_orders: "My Orders",
+    my_favorites: "My Favorites",
+    my_addresses: "My Addresses",
+    my_cards: "My Cards",
+    setup_profile: "Setup Profile",
+    order_details: "Order Details",
+  },
+  fr: {
+    my_orders: "Mes commandes",
+    my_favorites: "Mes favoris",
+    my_addresses: "Mes adresses",
+    my_cards: "Mes cartes",
+    setup_profile: "Configurer le profil",
+    order_details: "Détails de la commande",
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 const MenuNavigation = () => {
   const ProfileStack = createNativeStackNavigator();
 
@@ -24,7 +50,7 @@ const MenuNavigation = () => {
       <ProfileStack.Screen
         name="Favorites"
         options={{
-          title: "My Favorites",
+          title: i18n.t("my_favorites"),
 
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
@@ -36,7 +62,7 @@ const MenuNavigation = () => {
       <ProfileStack.Screen
         name="Orders"
         options={{
-          title: "My Orders",
+          title: i18n.t("my_orders"),
 
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
@@ -48,7 +74,7 @@ const MenuNavigation = () => {
       <ProfileStack.Screen
         name="Addresses"
         options={{
-          title: "My Addresses",
+          title: i18n.t("my_addresses"),
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
             fontSize: 20,
@@ -60,7 +86,7 @@ const MenuNavigation = () => {
         name="CreditCards"
         component={CreditCardsScreen}
         options={{
-          title: "My Credit Cards",
+          title: i18n.t("my_cards"),
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
             fontSize: 20,
@@ -78,7 +104,7 @@ const MenuNavigation = () => {
         name="CompleteProfile"
         component={CompleteProfileScreen}
         options={{
-          title: "Setup Profile",
+          title: i18n.t("setup_profile"),
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
             fontSize: 20,
@@ -89,7 +115,7 @@ const MenuNavigation = () => {
         name="Details"
         component={OrderDetailsScreen}
         options={({ navigation }) => ({
-          title: "Order Details", // Optional: You can set a custom title
+          title: i18n.t("order_details"), // Optional: You can set a custom title
 
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,

@@ -78,7 +78,7 @@ const CardMenuItem = ({ name, id, image, uid, size, price, customization }) => {
                 className="text-xs text-pr mr-2"
                 style={{ fontFamily: Fonts.LATO_REGULAR }}
               >
-                View Customization
+                Details
               </Text>
               <Entypo name="chevron-thin-down" size={14} color="#F7A600" />
             </TouchableOpacity>

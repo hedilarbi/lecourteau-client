@@ -6,10 +6,40 @@ import { getOrder } from "../services/OrderServices";
 import { useEffect } from "react";
 import { ActivityIndicator } from "react-native";
 import { ScrollView } from "react-native";
-import { TouchableOpacity } from "react-native";
+
 import { Fonts } from "../constants";
 import Error from "../components/Error";
 import { convertDate } from "../utils/dateHandlers";
+
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    status: "Status",
+    address: "Address",
+    items: "Items",
+    offers: "Offers",
+    rewards: "Rewards",
+    subtotale: "Subtotale",
+    delivery: "Delivery",
+    total: "Total",
+  },
+  fr: {
+    status: "Etat",
+    address: "Adresse",
+    items: "Articles",
+    offers: "Offers",
+    rewards: "Rewards",
+    subtotale: "Sous-total",
+    delivery: "Livraison",
+    total: "Totale",
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const OrderDetailsScreen = () => {
   const route = useRoute();
@@ -78,7 +108,7 @@ const OrderDetailsScreen = () => {
         </View>
         <View className="flex-row  mt-2">
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            Status:
+            {i18n.t("status")}:
           </Text>
           <Text
             className="ml-3"
@@ -104,7 +134,18 @@ const OrderDetailsScreen = () => {
         </View>
         <View className="flex-row  mt-2">
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-            Address:
+            Type:
+          </Text>
+          <Text
+            className="ml-3"
+            style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+          >
+            {order.type}
+          </Text>
+        </View>
+        <View className="flex-row  mt-2">
+          <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+            {i18n.t("address")}:
           </Text>
           <Text
             className="ml-3 w-3/4"
@@ -119,7 +160,7 @@ const OrderDetailsScreen = () => {
         style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}
         className="mt-3"
       >
-        Items
+        {i18n.t("items")}
       </Text>
       <View className="bg-white rounded-md p-4 mt-3 ">
         {order.orderItems.map((item, index) => (
@@ -131,7 +172,11 @@ const OrderDetailsScreen = () => {
             }
           >
             <View className="flex-row justify-between">
-              <Text style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}>
+              <Text
+                style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                className="w-2/5"
+                numberOfLines={1}
+              >
                 {item.item.name}
               </Text>
               <Text style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}>
@@ -147,7 +192,7 @@ const OrderDetailsScreen = () => {
       {order.offers.length > 0 && (
         <>
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
-            Offers
+            {i18n.t("offers")}
           </Text>
           <View className="bg-white rounded-md p-2 mt-3 border-gray-300 space-y-2">
             {order.offers.map((item, index) => (
@@ -161,6 +206,8 @@ const OrderDetailsScreen = () => {
                 <View className="flex-row justify-between">
                   <Text
                     style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+                    className="w-1/3"
+                    numberOfLines={1}
                   >
                     {item.name}
                   </Text>
@@ -178,7 +225,7 @@ const OrderDetailsScreen = () => {
       {order.rewards.length > 0 && (
         <>
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
-            Rewards
+            {i18n.t("rewards")}
           </Text>
           <View className="bg-white rounded-md p-2 mt-3  space-y-2">
             {order.rewards.map((item, index) => (
@@ -220,7 +267,7 @@ const OrderDetailsScreen = () => {
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             className="text-sm text-tgry"
           >
-            Subtotal
+            {i18n.t("subtotale")}
           </Text>
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
             {order.sub_total}$
@@ -231,7 +278,7 @@ const OrderDetailsScreen = () => {
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             className="text-sm text-tgry"
           >
-            Delivery
+            {i18n.t("delivery")}
           </Text>
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
             {order.delivery_fee}$
@@ -264,7 +311,7 @@ const OrderDetailsScreen = () => {
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             className="text-sm text-tgry"
           >
-            Total
+            {i18n.t("total")}
           </Text>
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
             {order.total_price.toFixed(2)}$

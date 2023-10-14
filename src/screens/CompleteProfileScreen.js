@@ -1,15 +1,16 @@
 import { View, Text, SafeAreaView, TextInput } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import * as ImagePicker from "expo-image-picker";
+
 import { Fonts } from "../constants";
 import { selectUser, setUser } from "../redux/slices/userSlice";
 import { TouchableOpacity } from "react-native";
-import { Entypo } from "@expo/vector-icons";
+
 import { updateUserInfo } from "../services/UserServices";
 import { ActivityIndicator } from "react-native";
 import SuccessModel from "../components/SuccessModel";
 import ErrorModal from "../components/ErrorModal";
+import { formatDate } from "../utils/dateHandlers";
 
 const CompleteProfileScreen = () => {
   const [isSuccess, setIsSuccess] = useState(false);
@@ -96,12 +97,12 @@ const CompleteProfileScreen = () => {
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
             Phone Number
           </Text>
-          <Text
-            className=" py-3 px-2 bg-white rounded-md mt-2 text-black"
+          <TextInput
+            className="py-2 px-2 bg-white rounded-md mt-2"
             style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-          >
-            {user.phone_number}
-          </Text>
+            placeholder={user.phone_number}
+            editable={false}
+          />
         </View>
         <View className="mt-4">
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
@@ -126,6 +127,17 @@ const CompleteProfileScreen = () => {
             placeholder={user.email}
             onChangeText={(text) => setEmail(text)}
             ref={emailInput}
+          />
+        </View>
+        <View className="mt-4 ">
+          <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
+            Date Of Birth
+          </Text>
+          <TextInput
+            className="py-2 px-2 bg-white rounded-md mt-2"
+            style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
+            placeholder={formatDate(user.date_of_birth)}
+            editable={false}
           />
         </View>
       </View>

@@ -12,12 +12,26 @@ import ProfileNavigation from "./ProfileNavigation";
 import HomeNavigation from "./HomeNavigator";
 
 import * as Notifications from "expo-notifications";
-import { registerForPushNotificationsAsync } from "../../services/NotificationsServices";
-import { useSelector } from "react-redux";
-import { selectUser } from "../../redux/slices/userSlice";
-import { updateUserExpoToken } from "../../services/UserServices";
+
 import { useNavigation } from "@react-navigation/native";
-import { StatusBar } from "react-native";
+
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    home: "Home",
+    rewards: "Rewards",
+  },
+  fr: {
+    home: "Acceuil",
+    rewards: "Récompense",
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const TabNavigation = () => {
   const MainTab = createBottomTabNavigator();
@@ -113,7 +127,7 @@ const TabNavigation = () => {
         <MainTab.Screen
           name="Home"
           component={HomeNavigation}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, title: i18n.t("home") }}
         />
         <MainTab.Screen
           name="MenuNav"
@@ -123,7 +137,7 @@ const TabNavigation = () => {
         <MainTab.Screen
           name="Rewards"
           component={RewardsScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, title: i18n.t("rewards") }}
         />
 
         <MainTab.Screen

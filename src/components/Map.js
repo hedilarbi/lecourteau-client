@@ -1,21 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUserAddress, setUserAddress } from "../redux/slices/userSlice";
 import { View } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
-import { TextInput } from "react-native";
+
 import * as Location from "expo-location";
 import { Fonts } from "../constants";
 import { Text } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { GOOGLE_MAPS_API_KEY } from "@env";
 const Map = ({ setShowMap }) => {
   const { location, address } = useSelector(selectUserAddress);
 
   const dispatch = useDispatch();
 
-  const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
   const initialRegion = {
     latitude: location.latitude,
     longitude: location.longitude,

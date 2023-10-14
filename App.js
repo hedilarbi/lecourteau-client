@@ -11,6 +11,8 @@ import { Provider } from "react-redux";
 import RootNavigation from "./src/navigation/RootNavigation";
 import { store } from "./src/redux/store";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StripeProvider } from "@stripe/stripe-react-native";
+import { STRIPE_PUBLIC_KEY } from "@env";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,14 +38,16 @@ export default function App() {
   }
   return (
     <Provider store={store}>
-      <>
-        <StatusBar
-          translucent={true}
-          backgroundColor="transparent"
-          barStyle="dark-content"
-        />
-        <RootNavigation />
-      </>
+      <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
+        <>
+          <StatusBar
+            translucent={true}
+            backgroundColor="transparent"
+            barStyle="dark-content"
+          />
+          <RootNavigation />
+        </>
+      </StripeProvider>
     </Provider>
   );
 }

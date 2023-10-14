@@ -15,12 +15,23 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.hedilarbi95.lecourteauclient",
+
       "config": {
         "googleMapsApiKey": "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w"
+      },
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.285470002492-rv13ncgqg5qvndr2lqj74hs4nerah1kj"
+            ]
+          }
+        ]
       }
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
+
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -40,6 +51,7 @@
       "eas": {
         "projectId": "cfd95bcc-7f5d-4868-b417-28aee71e3a2f"
       }
-    }
+    },
+    "plugins": ["expo-localization"]
   }
 }

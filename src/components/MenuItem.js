@@ -6,7 +6,6 @@ import { AntDesign } from "@expo/vector-icons";
 import {
   addToBasket,
   deleteFromBasket,
-  removeFromBasket,
   selectBasketItemsWithID,
 } from "../redux/slices/basketSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +18,7 @@ import WarningModel from "./WarningModel";
 import { memo } from "react";
 import OutOfStockModal from "./OutOfStockModal";
 
-const MenuItem = memo(({ name, image, prices, id, is_available }) => {
+const MenuItem = memo(({ name, image, prices, id, is_available, text }) => {
   const [like, setLike] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -126,7 +125,7 @@ const MenuItem = memo(({ name, image, prices, id, is_available }) => {
             style={{ fontFamily: Fonts.LATO_BOLD }}
             className="text-black text-xs mr-3"
           >
-            Customize
+            {text.customize}
           </Text>
           <AntDesign name="arrowright" size={14} color="black" />
         </TouchableOpacity>
@@ -164,7 +163,7 @@ const MenuItem = memo(({ name, image, prices, id, is_available }) => {
               style={{ fontFamily: Fonts.LATO_REGULAR }}
               className="text-sm text-red-500"
             >
-              out of stock
+              {text.stock}
             </Text>
           )}
         </View>
@@ -175,7 +174,7 @@ const MenuItem = memo(({ name, image, prices, id, is_available }) => {
               style={{ fontFamily: Fonts.LATO_REGULAR }}
               className="text-xs justify-self-start"
             >
-              Choose size
+              {text.size}
             </Text>
             <DropDown sizes={sizes} setSize={setSize} size={size} />
             <View className="h-2"></View>

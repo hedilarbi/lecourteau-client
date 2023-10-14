@@ -3,7 +3,7 @@ import React from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Fonts } from "../constants";
 import { useNavigation } from "@react-navigation/native";
-const WarningModel = ({ setShowWarningModel, showWarningModel }) => {
+const WarningModel = ({ setShowWarningModel, showWarningModel, text }) => {
   const navigation = useNavigation();
   return (
     <Modal

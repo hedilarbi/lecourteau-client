@@ -8,7 +8,11 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "http://192.168.1.15:5000/api"
+        "API_URL": "http://3.141.103.96:5000/api",
+        "TWILIO_BASE_URL": "https://verify-2541-ivuvdh.twil.io",
+        "STRIPE_PUBLIC_KEY": "pk_test_51NyGzHJmC9awq9l2bA3dhqRnyzb7zNoiaO2WOY3osQlRPPE6MZ116B6eDEbodkAU175z3fKwEwRqycmgLe7vtHzW00r2Y3CVbd",
+        "STRIPE_PRIVATE_KEY": "sk_test_51NyGzHJmC9awq9l25ziYvtrxzBERQzXpNrK4awhFHHamcLqX6409A9N0Dtm7sm6Wekc1qxFoVNZIO9Q7P5xhmpCQ00flK52o2V",
+        "GOOGLE_MAPS_API_KEY": "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w"
       }
     },
     "preview2": {

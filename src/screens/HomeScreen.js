@@ -1,7 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import UserAddress from "../components/UserAddress";
 import { Fonts } from "../constants";
 import News from "../components/News";
 import { AntDesign } from "@expo/vector-icons";
@@ -19,6 +18,7 @@ import {
   selectUserAddress,
   setUserAddress,
 } from "../redux/slices/userSlice";
+import UserAddress from "../components/UserAddress";
 import { getRestaurantSettings } from "../services/RestaurantServices";
 import WarningBanner from "../components/WarningBanner";
 import { setSettings } from "../redux/slices/settingsSlice";
@@ -27,10 +27,28 @@ import { ActivityIndicator } from "react-native";
 import Error from "../components/Error";
 import { registerForPushNotificationsAsync } from "../services/NotificationsServices";
 import { updateUserExpoToken } from "../services/UserServices";
+import ReviewModel from "../components/ReviewModel";
+import { getItemAsync } from "expo-secure-store";
+import { getOrder } from "../services/OrderServices";
+import { GOOGLE_MAPS_API_KEY } from "@env";
+
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import HomeFr from "../translation/fr/Home";
+import HomeEn from "../translation/en/Home";
+
+const translation = {
+  en: HomeEn,
+  fr: HomeFr,
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const HomeScreen = () => {
   const [showMap, setShowMap] = useState(false);
-  const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
+
   Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -43,6 +61,8 @@ const HomeScreen = () => {
   const [addressIsLoading, setAddressIsLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
   const [errors, setErrors] = useState(false);
+  const [showReviewModel, setShowReviewModel] = useState(false);
+  const [orderId, setOrderId] = useState(null);
   const user = useSelector(selectUser);
 
   useEffect(() => {
@@ -158,6 +178,33 @@ const HomeScreen = () => {
     fetchData();
   }, [refresh]);
 
+  const retrieveOrderId = async () => {
+    const id = await getItemAsync("orderId");
+    return id;
+  };
+
+  const getLastOrder = async () => {
+    const id = await retrieveOrderId();
+    setOrderId(id);
+
+    if (id) {
+      getOrder(id).then((response) => {
+        if (response.status) {
+          if (
+            response.data.status === "Delivered" &&
+            response.data.review.status === false
+          ) {
+            setShowReviewModel(true);
+          }
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+    getLastOrder();
+  });
+
   if (isLoading || addressIsLoading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -174,6 +221,16 @@ const HomeScreen = () => {
     <SafeAreaView
       className={showMap ? "flex-1 bg-bg " : "flex-1 bg-bg  px-3 py-4"}
     >
+      <ReviewModel
+        modalVisible={showReviewModel}
+        setModalVisible={setShowReviewModel}
+        orderId={orderId}
+        text={{
+          button: i18n.t("send"),
+          placeHolder: i18n.t("comment"),
+          title: i18n.t("review_title"),
+        }}
+      />
       {showWarningBanner && <WarningBanner />}
       {showMap ? (
         <Map setShowMap={setShowMap} />
@@ -199,13 +256,33 @@ const HomeScreen = () => {
               </View>
             </TouchableOpacity>
           )}
-          <UserAddress setShowMap={setShowMap} />
+          <UserAddress
+            setShowMap={setShowMap}
+            text={i18n.t("current_location")}
+          />
           <ScrollView showsVerticalScrollIndicator={false}>
-            <News />
+            <News
+              text={{
+                button: i18n.t("all_button"),
+                title: i18n.t("new_section"),
+              }}
+            />
 
-            <Menu categories={categories} />
+            <Menu
+              categories={categories}
+              text={{
+                button: i18n.t("all_button"),
+                title: i18n.t("explore_menu_section"),
+              }}
+            />
 
-            <Offers offers={offers} />
+            <Offers
+              offers={offers}
+              text={{
+                button: i18n.t("all_button"),
+                title: i18n.t("offers_section"),
+              }}
+            />
           </ScrollView>
         </View>
       )}

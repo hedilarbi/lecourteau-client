@@ -16,6 +16,7 @@ import { Fonts } from "../constants";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { addToAddresses } from "../services/UserServices";
+import { GOOGLE_MAPS_API_KEY } from "@env";
 
 const SetAddressScreen = () => {
   const { location, address } = useSelector(selectUserAddress);
@@ -26,7 +27,6 @@ const SetAddressScreen = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const GOOGLE_MAPS_API_KEY = "AIzaSyC2t8GvZFa6Ld6fbKM6_m2n3M0JoOmI03w";
   const initialRegion = {
     latitude: location.latitude,
     longitude: location.longitude,

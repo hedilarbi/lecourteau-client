@@ -9,6 +9,25 @@ import ProcessScreen from "../../screens/ProcessScreen";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { Fonts } from "../../constants";
 import SetAddressScreen from "../../screens/SetAddressScreen";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    cart: "Cart",
+    checkout: "Checkout",
+    customize: "Customize",
+  },
+  fr: {
+    cart: "Panier",
+    checkout: "Paiement",
+    customize: "Personnaliser",
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 const MenuNavigation = () => {
   const MenuStack = createNativeStackNavigator();
 
@@ -25,7 +44,7 @@ const MenuNavigation = () => {
         name="Card"
         component={CardScreen}
         options={({ navigation }) => ({
-          title: "Cart", // Optional: You can set a custom title
+          title: i18n.t("cart"), // Optional: You can set a custom title
 
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
@@ -53,6 +72,7 @@ const MenuNavigation = () => {
         name="Customize"
         component={CustomizeScreen}
         options={{
+          title: i18n.t("customize"),
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
             fontSize: 20,
@@ -63,22 +83,14 @@ const MenuNavigation = () => {
         name="Checkout"
         component={CheckoutScreen}
         options={{
+          title: i18n.t("checkout"),
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
             fontSize: 20,
           },
         }}
       />
-      <MenuStack.Screen
-        name="Paiement"
-        component={PaiementScreen}
-        options={{
-          headerTitleStyle: {
-            fontFamily: Fonts.BEBAS_NEUE,
-            fontSize: 20,
-          },
-        }}
-      />
+
       <MenuStack.Screen
         name="Process"
         component={ProcessScreen}

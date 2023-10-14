@@ -160,12 +160,13 @@ const getUserByToken = async (token) => {
   }
 };
 
-const setUserInfo = async (id, name, email, address, coords) => {
+const setUserInfo = async (id, name, email, address, coords, date) => {
   try {
     let updateUserInfoResponse = await axios.put(`${API_URL}/users/set/${id}`, {
       name,
       email,
       address,
+      date_of_birth: date,
       coords,
     });
     if (updateUserInfoResponse.status === 200) {

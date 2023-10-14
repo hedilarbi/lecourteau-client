@@ -6,14 +6,14 @@ import { useNavigation } from "@react-navigation/native";
 import { Fonts } from "../constants";
 import { AntDesign } from "@expo/vector-icons";
 
-const Menu = memo(({ categories }) => {
+const Menu = memo(({ categories, text }) => {
   const navigation = useNavigation();
   return (
     <>
       <View className="mt-4 flex-row justify-between items-center">
         <View>
           <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-lg">
-            explore menu
+            {text.title}
           </Text>
           <View className="bg-pr h-0.5 w-8 "></View>
         </View>
@@ -22,7 +22,7 @@ const Menu = memo(({ categories }) => {
           onPress={() => navigation.navigate("MenuNav")}
         >
           <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-sm">
-            view all
+            {text.button}
           </Text>
           <AntDesign
             name="arrowright"

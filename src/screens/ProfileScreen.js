@@ -5,15 +5,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  clearUser,
-  clearUserToken,
-  selectUser,
-} from "../redux/slices/userSlice";
+import { clearUserToken, selectUser } from "../redux/slices/userSlice";
 import { deleteItemAsync } from "expo-secure-store";
 import DeleteWarning from "../components/DeleteWarning";
 import { Fonts } from "../constants";
 import ErrorModal from "../components/ErrorModal";
+
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import ProfileFr from "../translation/fr/Profile";
+import ProfileEn from "../translation/en/Profile";
+
+const translation = {
+  en: ProfileEn,
+  fr: ProfileFr,
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -40,7 +50,7 @@ const ProfileScreen = () => {
     } finally {
       navigation.reset({
         index: 0,
-        routes: [{ name: "SignUp" }],
+        routes: [{ name: "Auth" }],
       });
     }
   };
@@ -72,6 +82,11 @@ const ProfileScreen = () => {
         <DeleteWarning
           id={user._id}
           setShowDeleteWarning={setShowDeleteWarningModel}
+          text={{
+            warning: i18n.t("delete_account_warning_text"),
+            confirm: i18n.t("delete_account_confirm"),
+            cancel: i18n.t("delete_account_cancel"),
+          }}
         />
       )}
       <View className="flex-1 p-3 pb-12">
@@ -114,7 +129,9 @@ const ProfileScreen = () => {
               className=""
               onPress={() => navigation.navigate("CompleteProfile")}
             >
-              <Text style={{ fontFamily: Fonts.LATO_BOLD }}>Setup Profile</Text>
+              <Text style={{ fontFamily: Fonts.LATO_BOLD }}>
+                {i18n.t("setup_profile_button")}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -129,7 +146,7 @@ const ProfileScreen = () => {
                 className="text-sm ml-4"
                 style={{ fontFamily: Fonts.LATO_BOLD }}
               >
-                My Orders
+                {i18n.t("my_orders")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -141,7 +158,7 @@ const ProfileScreen = () => {
                 className="text-sm ml-4"
                 style={{ fontFamily: Fonts.LATO_BOLD }}
               >
-                My Favorites
+                {i18n.t("my_favorites")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -157,10 +174,10 @@ const ProfileScreen = () => {
                 className="text-sm ml-4"
                 style={{ fontFamily: Fonts.LATO_BOLD }}
               >
-                My Addresses
+                {i18n.t("my_addresses")}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               className="flex-row items-center"
               onPress={() => navigation.navigate("CreditCards")}
             >
@@ -169,9 +186,9 @@ const ProfileScreen = () => {
                 className="text-sm ml-4"
                 style={{ fontFamily: Fonts.LATO_BOLD }}
               >
-                My Cards
+                {i18n.t("my_cards")}
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <View className="space-y-6">
             <TouchableOpacity
@@ -183,7 +200,7 @@ const ProfileScreen = () => {
                 className="text-sm ml-4"
                 style={{ fontFamily: Fonts.LATO_BOLD }}
               >
-                Logout
+                {i18n.t("logout")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -195,7 +212,7 @@ const ProfileScreen = () => {
                 className="text-sm ml-4"
                 style={{ fontFamily: Fonts.LATO_BOLD }}
               >
-                Delete Account
+                {i18n.t("delete_account")}
               </Text>
             </TouchableOpacity>
           </View>

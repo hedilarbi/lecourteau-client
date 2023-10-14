@@ -18,6 +18,25 @@ import {
 } from "../redux/slices/basketSlice";
 import Error from "../components/Error";
 
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    items: "Items",
+    customization: "Customization",
+    price: "Price",
+  },
+  fr: {
+    items: "Articles",
+    customization: "Personnaliser",
+    price: "Prix",
+  },
+};
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
+
 const OfferScreen = () => {
   const route = useRoute();
   const { id } = route.params;
@@ -187,7 +206,7 @@ const OfferScreen = () => {
             className="mx-3 mt-3"
             style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}
           >
-            Items:
+            {i18n.t("items")}:
           </Text>
           <ScrollView className="flex-1">
             {offer.items?.map((item) => {
@@ -217,7 +236,7 @@ const OfferScreen = () => {
             style={{ fontFamily: Fonts.LATO_BOLD }}
             className="text-base px-3"
           >
-            Customization
+            {i18n.t("customization")}
           </Text>
           <ScrollView>
             {Object.entries(categorizedCustomization).map(([key, toppings]) => {
@@ -290,7 +309,7 @@ const OfferScreen = () => {
           </ScrollView>
           <View className="flex-row justify-between items-center mx-3">
             <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
-              Price:
+              {i18n.t("price")}:
             </Text>
             <Text
               style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}

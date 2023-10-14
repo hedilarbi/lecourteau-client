@@ -56,5 +56,33 @@ const getOrder = async (id) => {
     };
   }
 };
+const reviewOrder = async (id, comment, rating) => {
+  try {
+    let reviewOrderResponse = await axios.put(
+      `${API_URL}/orders/review/${id}`,
+      { comment, rating },
+      {
+        timeout: 10000,
+      }
+    );
+    if (reviewOrderResponse.status === 200) {
+      return {
+        status: true,
+        message: "order data",
+        data: reviewOrderResponse.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "didn't found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
 
-export { createOrder, getOrder };
+export { createOrder, getOrder, reviewOrder };

@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -10,85 +9,32 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { I18n } from "i18n-js";
+import * as Localization from "expo-localization";
+import * as Linking from "expo-linking";
+
+import CanadaFlag from "../../assets/icons/CanadaFlag.svg";
 import FullLogo from "../../assets/icons/FullLogo.svg";
 import { Fonts } from "../constants";
-import CanadaFlag from "../../assets/icons/CanadaFlag.svg";
-import { useNavigation } from "@react-navigation/native";
-import * as Google from "expo-auth-session/providers/google";
-import { createUser } from "../services/UserServices";
-import { useDispatch } from "react-redux";
-import { setUser, setUserToken } from "../redux/slices/userSlice";
-import { setItemAsync } from "expo-secure-store";
-import { useRef } from "react";
-import ErrorModal from "../components/ErrorModal";
+import SignupFr from "../translation/fr/Signup";
+import SignupEn from "../translation/en/Signup";
+
+const translation = {
+  en: SignupEn,
+  fr: SignupFr,
+};
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const [accessToken, setAccessToken] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+
   const [phoneNumber, setPhoneNumber] = useState("");
-  const phoneNumberInput = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isFail, setIsFail] = useState(false);
-  useEffect(() => {
-    if (isFail) {
-      const timer = setTimeout(() => {
-        setIsFail(false);
-      }, 2000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [isFail]);
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId:
-      "879272250209-b53otha4u3m89k4locgb5i5r7ueu0m5m.apps.googleusercontent.com",
-    iosClientId:
-      "879272250209-c3ashg2bv9aa1r0s392p3og5hlf5jthu.apps.googleusercontent.com",
-    expoClientId:
-      "879272250209-3jrgcljrq13b10k1eh5fk67js9a6lsln.apps.googleusercontent.com",
-  });
-
-  const getUserData = async () => {
-    if (!accessToken) {
-      const result = await promptAsync({
-        useProxy: true,
-        showInRecents: true,
-      });
-
-      if (result.type === "success") {
-        setAccessToken(result.authentication.accessToken);
-
-        await fetch("https://www.googleapis.com/userinfo/v2/me", {
-          headers: {
-            Authorization: `Bearer ${result.authentication.accessToken}`,
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
-          })
-          .catch((error) => {
-            console.error("Error fetching user data:", error);
-          });
-      }
-    } else {
-      await fetch("https://www.googleapis.com/userinfo/v2/me", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }).then((response) => {
-        response.json().then((data) => {
-          console.log(data);
-        });
-      });
-    }
-  };
-
-  const saveUserToken = async (token) => {
-    await setItemAsync("token", token);
-  };
+  const phoneNumberInput = useRef(null);
 
   const sendOtp = async () => {
     phoneNumberInput.current.setNativeProps({
@@ -106,19 +52,12 @@ const SignUpScreen = () => {
       return null;
     }
     setIsLoading(true);
-    createUser(phoneNumber)
-      .then((response) => {
-        if (response.status) {
-          saveUserToken(response.data.token);
-          dispatch(setUserToken(response.data.token));
-          dispatch(setUser(response.data.user));
-        } else {
-          setIsFail(true);
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    const formattedValue = "+1" + phoneNumber;
+    // sendSmsVerification(formattedValue).then((sent) => {
+    //   navigation.navigate("Otp", { phoneNumber: formattedValue });
+    // });
+    navigation.navigate("Otp", { phoneNumber: formattedValue });
+    setIsLoading(false);
   };
 
   return (
@@ -126,7 +65,6 @@ const SignUpScreen = () => {
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ErrorModal visiblity={isFail} />
       {isLoading && (
         <View
           className="justify-center items-center absolute top-0 left-0 z-30 h-full w-full"
@@ -144,13 +82,13 @@ const SignUpScreen = () => {
         </View>
         <View className="w-11/12  bg-[#EBEBEB]  absolute self-center bottom-14 rounded-2xl p-6">
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm ">
-            Sign in with phone number
+            {i18n.t("sign_up_title")}
           </Text>
           <Text
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             className="text-xs text-tgry mt-1"
           >
-            Login with a valid phone number
+            {i18n.t("sign_up_subtitle")}
           </Text>
           <View
             className="bg-white rounded-md mt-4 flex-row px-3 py-1"
@@ -161,7 +99,7 @@ const SignUpScreen = () => {
               <Text style={{ fontFamily: Fonts.LATO_REGULAR }}>+1</Text>
             </View>
             <TextInput
-              placeholder="Phone Number"
+              placeholder={i18n.t("phone_number")}
               className="flex-1 ml-5"
               placeholderTextColor="#CBC6C6"
               style={{ fontFamily: Fonts.LATO_REGULAR }}
@@ -175,58 +113,31 @@ const SignUpScreen = () => {
           >
             e.x 8XXXXXXX
           </Text>
-
           <TouchableOpacity
             className="mt-5 bg-pr rounded-md py-2 items-center"
             onPress={sendOtp}
           >
             <Text
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
+              style={{ fontFamily: Fonts.LATO_BOLD }}
               className="text-base "
             >
-              Sign Up
+              {i18n.t("sign_up_button")}
             </Text>
           </TouchableOpacity>
-
-          <Text
+          {/* <Text
             className="mt-8 text-sm"
             style={{ fontFamily: Fonts.LATO_BOLD }}
           >
-            Sign up with email
-          </Text>
-          <TouchableOpacity
-            className="flex-row bg-white rounded-md items-center justify-center  py-2 mt-3"
-            onPress={() => getUserData()}
-          >
-            <Image
-              source={require("../../assets/Google.png")}
-              className="h-6 w-6"
-              style={{ resizeMode: "contain" }}
-            />
+            {i18n.t("sign_up_options")}
+          </Text> */}
+          <View className="h-36"></View>
 
-            <Text
-              className="text-base ml-2"
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
-            >
-              Google
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="flex-row bg-white rounded-md items-center justify-center  py-2 mt-3">
-            <Image
-              source={require("../../assets/Apple.png")}
-              className="h-6 w-6"
-              style={{ resizeMode: "contain" }}
-            />
-
-            <Text
-              className="text-base ml-2"
-              style={{ fontFamily: Fonts.LATO_REGULAR }}
-            >
-              Apple
-            </Text>
-          </TouchableOpacity>
           <View className="flex-row justify-between items-center mt-9 ">
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL("https://lecourteau.com/termes-conditions/");
+              }}
+            >
               <Text
                 className="text-pr text-xxs"
                 style={{ fontFamily: Fonts.LATO_REGULAR }}
@@ -240,9 +151,12 @@ const SignUpScreen = () => {
             >
               <Text
                 className="text-xxs"
-                style={{ fontFamily: Fonts.LATO_REGULAR }}
+                style={{
+                  fontFamily: Fonts.LATO_REGULAR,
+                  textTransform: "uppercase",
+                }}
               >
-                SKIP LOGIN
+                {i18n.t("skip_login_button")}
               </Text>
             </TouchableOpacity>
           </View>

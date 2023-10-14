@@ -21,6 +21,26 @@ import { getMenuItem } from "../services/FoodServices";
 import Error from "../components/Error";
 import DropDown from "../components/DropDown";
 
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    size: "Choose size",
+    customization: "Customization",
+    price: "Price",
+  },
+  fr: {
+    size: "Choisir la taille",
+    customization: "Personnaliser",
+    price: "Prix",
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
+
 const CustomizeScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
@@ -203,7 +223,7 @@ const CustomizeScreen = () => {
 
         <View className="flex-row items-center mt-3 px-3">
           <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-base">
-            Choose Size
+            {i18n.t("size")}
           </Text>
           <View className="ml-3  bg-white border-pr rounded-md">
             <DropDown size={size} setSize={setSize} sizes={sizes} />
@@ -214,7 +234,7 @@ const CustomizeScreen = () => {
           style={{ fontFamily: Fonts.BEBAS_NEUE }}
           className="text-base mt-3 px-3"
         >
-          Customization
+          {i18n.t("customization")}
         </Text>
 
         {Object.entries(categorizedCustomization).map(([key, toppings]) => {
@@ -288,7 +308,7 @@ const CustomizeScreen = () => {
 
       <View className="px-3 my-3 flex-row justify-between items-center">
         <Text className="text-base" style={{ fontFamily: Fonts.LATO_BOLD }}>
-          Price
+          {i18n.t("price")}
         </Text>
         <Text
           style={{ fontFamily: Fonts.LATO_BOLD }}

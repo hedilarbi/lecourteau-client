@@ -11,6 +11,27 @@ import { setUser } from "../redux/slices/userSlice";
 import { Fonts } from "../constants";
 import FullLogo from "../../assets/icons/FullLogo.svg";
 import SuccessModel from "../components/SuccessModel";
+import { setItemAsync } from "expo-secure-store";
+
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    warning: "Something went wrong",
+    button: "Refresh",
+    status: "Processing Order ...",
+  },
+  fr: {
+    warning: "Quelque chose s'est mal passé.",
+    button: "Rafraichir",
+    status: "Traitement de la commande ...",
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 const ProcessScreen = () => {
   const order = useSelector(selectOrder);
   const navigation = useNavigation();
@@ -22,10 +43,11 @@ const ProcessScreen = () => {
   const processOrder = async () => {
     setError(false);
     createOrder(order)
-      .then((response) => {
+      .then(async (response) => {
         if (response?.status) {
+          await setItemAsync("orderId", response.data.orderId);
           setShowSuccessModel(true);
-          dispatch(setUser(response.data));
+          dispatch(setUser(response.data.user));
         } else {
           setError(true);
           console.log(response);
@@ -39,17 +61,13 @@ const ProcessScreen = () => {
 
   useEffect(() => {
     if (showSuccessModel) {
-      // After 1 second, reset showSuccessModel to false
       const timer = setTimeout(() => {
         dispatch(clearBasket());
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Home" }],
-        });
+        navigation.popToTop();
         setShowSuccessModel(false);
       }, 2000);
 
-      return () => clearTimeout(timer); // Clear the timer if the component unmounts before 1 second
+      return () => clearTimeout(timer);
     }
   }, [showSuccessModel]);
   return (
@@ -63,7 +81,7 @@ const ProcessScreen = () => {
               style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
               className="text-red-300"
             >
-              Something Went Wrong
+              {i18n.t("warning")}
             </Text>
             <TouchableOpacity
               className="bg-pr rounded-md py-2 items-center flex-row  px-8  mt-3   "
@@ -74,7 +92,7 @@ const ProcessScreen = () => {
                 style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
                 className="ml-2"
               >
-                Refresh
+                {i18n.t("button")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -83,7 +101,7 @@ const ProcessScreen = () => {
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             className="text-base text-pr mt-4"
           >
-            Traitement ...{" "}
+            {i18n.t("status")}
           </Text>
         )}
       </View>

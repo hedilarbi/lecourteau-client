@@ -6,19 +6,19 @@ import { AntDesign } from "@expo/vector-icons";
 import OffersItem from "./OffersItem";
 import { FlatList } from "react-native";
 
-const Offers = memo(({ offers }) => {
+const Offers = memo(({ offers, text }) => {
   return (
     <>
       <View className="mt-4 flex-row justify-between items-center">
         <View>
           <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-lg">
-            top offers
+            {text.title}
           </Text>
           <View className="bg-pr h-0.5 w-8 "></View>
         </View>
-        <TouchableOpacity className="flex-row items-center">
+        {/* <TouchableOpacity className="flex-row items-center">
           <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-sm">
-            view all
+            {text.button}
           </Text>
           <AntDesign
             name="arrowright"
@@ -26,7 +26,7 @@ const Offers = memo(({ offers }) => {
             color="black"
             className="ml-2"
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View className="h-40 mt-4">

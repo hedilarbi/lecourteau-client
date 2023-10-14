@@ -17,7 +17,7 @@ import { clearUser } from "../redux/slices/userSlice";
 import { deleteItemAsync } from "expo-secure-store";
 import ErrorModal from "./ErrorModal";
 
-const DeleteWarning = ({ id, setShowDeleteWarning }) => {
+const DeleteWarning = ({ id, setShowDeleteWarning, text }) => {
   const [showSuccessModel, setShowSuccessModel] = useState(false);
   const [showFailModal, setShowFailModal] = useState(false);
   const dispatch = useDispatch();
@@ -90,23 +90,21 @@ const DeleteWarning = ({ id, setShowDeleteWarning }) => {
           <AntDesign name="exclamationcircle" size={32} color="#FF0707" />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Delete Warning</Text>
-            <Text style={styles.subTitle}>
-              Are you sure to delete your account?
-            </Text>
+            <Text style={styles.subTitle}>{text.warning}</Text>
           </View>
         </View>
         <View style={styles.btnsContainer}>
           <TouchableOpacity
             style={styles.cancelBtn}
-            onPress={() => setDeleteWarningModelState(false)}
+            onPress={() => setShowDeleteWarning(false)}
           >
-            <Text style={styles.btnText}>Cancel</Text>
+            <Text style={styles.btnText}>{text.cancel}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.confirmBtn}
             onPress={() => deleteFromList(id)}
           >
-            <Text style={styles.btnText}>Confirm</Text>
+            <Text style={styles.btnText}>{text.confirm}</Text>
           </TouchableOpacity>
         </View>
       </View>

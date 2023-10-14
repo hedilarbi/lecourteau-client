@@ -1,11 +1,10 @@
 import { View, Text } from "react-native";
 import React, { useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
-import { ScrollView } from "react-native";
 
 import { Fonts } from "../constants";
 import MenuItem from "../components/MenuItem";
@@ -15,11 +14,27 @@ import useMenuData from "../hooks/useMenuData";
 import { useState } from "react";
 import { ActivityIndicator } from "react-native";
 import Error from "../components/Error";
+import { selectUser } from "../redux/slices/userSlice";
+
+import MenuFr from "../translation/fr/Menu";
+import MenuEn from "../translation/en/Menu";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: MenuEn,
+  fr: MenuFr,
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const MenuScreen = ({ navigation }) => {
   const flatListRef = useRef(null);
   const basket = useSelector(selectBasket);
   const totalPrice = useSelector(selectBasketTotal);
+  const { favorites } = useSelector(selectUser);
 
   const [refresh, setRefresh] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +43,12 @@ const MenuScreen = ({ navigation }) => {
 
     if (item.name === "All") {
       setFilteredMenuItemsList(menuItemsList);
+      return null;
+    }
+    if (item.name === "Favorites") {
+      const list = menuItemsList.filter((item) => favorites.includes(item._id));
+
+      setFilteredMenuItemsList(list);
       return null;
     }
     const newMenuItemList = menuItemsList.filter(
@@ -93,7 +114,7 @@ const MenuScreen = ({ navigation }) => {
               </Text>
             </View>
             <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-xl">
-              Items
+              {i18n.t("basket_button_text")}
             </Text>
             <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-xl">
               {totalPrice}$
@@ -111,22 +132,35 @@ const MenuScreen = ({ navigation }) => {
           ref={flatListRef}
         />
       </View>
-      <FlatList
-        data={filteredMenuItemsList}
-        renderItem={({ item }) => (
-          <MenuItem
-            name={item.name}
-            image={item.image}
-            id={item._id}
-            description={item.description}
-            prices={item.prices}
-            key={item._id}
-            is_available={item.is_available}
-          />
-        )}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={{ paddingHorizontal: 2, paddingVertical: 4 }}
-      />
+      {filteredMenuItemsList.length > 0 ? (
+        <FlatList
+          data={filteredMenuItemsList}
+          renderItem={({ item }) => (
+            <MenuItem
+              name={item.name}
+              image={item.image}
+              id={item._id}
+              description={item.description}
+              prices={item.prices}
+              key={item._id}
+              is_available={item.is_available}
+              text={{
+                customize: i18n.t("customize_button"),
+                size: i18n.t("choose_size"),
+                stock: i18n.t("stock"),
+              }}
+            />
+          )}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={{ paddingHorizontal: 2, paddingVertical: 4 }}
+        />
+      ) : (
+        <View className="p-2 rounded-md justify-center items-center flex-1 bg-white">
+          <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-base">
+            Empty
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
