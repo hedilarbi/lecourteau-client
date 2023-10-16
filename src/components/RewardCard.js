@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import { removeRewardFromBasket } from "../redux/slices/basketSlice";
 import { addToFidelityPoints } from "../redux/slices/userSlice";
 
+
+
 const RewardCard = ({
   name,
   id,

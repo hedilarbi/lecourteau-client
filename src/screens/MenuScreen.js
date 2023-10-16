@@ -37,6 +37,7 @@ const MenuScreen = ({ navigation }) => {
   const { favorites } = useSelector(selectUser);
 
   const [refresh, setRefresh] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const filterMenuItems = (index, item) => {
     setSelectedItem(index);
@@ -122,6 +123,14 @@ const MenuScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
+      {isProcessing && (
+        <View
+          className="absolute top-0 left-0 justify-center items-center h-full w-full z-50"
+          style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
+        >
+          <ActivityIndicator size="large" color="#F7A600" />
+        </View>
+      )}
       <View className="pt-6 bg-white px-3">
         <FlatList
           horizontal
@@ -144,6 +153,7 @@ const MenuScreen = ({ navigation }) => {
               prices={item.prices}
               key={item._id}
               is_available={item.is_available}
+              setIsLoading={setIsProcessing}
               text={{
                 customize: i18n.t("customize_button"),
                 size: i18n.t("choose_size"),

@@ -23,7 +23,7 @@ i18n.enableFallback = true;
 const OutOfStockModal = ({ setShowOutOfStockModal, showOutOfStockModal }) => {
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       visible={showOutOfStockModal}
       onRequestClose={() => setShowOutOfStockModal(false)}

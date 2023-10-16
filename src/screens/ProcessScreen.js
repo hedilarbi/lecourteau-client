@@ -12,6 +12,7 @@ import { Fonts } from "../constants";
 import FullLogo from "../../assets/icons/FullLogo.svg";
 import SuccessModel from "../components/SuccessModel";
 import { setItemAsync } from "expo-secure-store";
+import { CommonActions } from "@react-navigation/native";
 
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -46,30 +47,45 @@ const ProcessScreen = () => {
       .then(async (response) => {
         if (response?.status) {
           await setItemAsync("orderId", response.data.orderId);
-          setShowSuccessModel(true);
           dispatch(setUser(response.data.user));
+          dispatch(clearBasket());
+        
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                { name: 'ProfileNav',state:{
+                  routes:[
+                    {
+            name:"Details",params:{id:response.data.orderId}
+                    }]
+                } },
+              
+              ],
+            })
+          );
         } else {
           setError(true);
           console.log(response);
         }
       })
-      .finally(() => {});
+      
   };
   useEffect(() => {
     processOrder();
   }, [refresh]);
 
-  useEffect(() => {
-    if (showSuccessModel) {
-      const timer = setTimeout(() => {
-        dispatch(clearBasket());
-        navigation.popToTop();
-        setShowSuccessModel(false);
-      }, 2000);
+  // useEffect(() => {
+  //   if (showSuccessModel) {
+  //     const timer = setTimeout(() => {
+  //       dispatch(clearBasket());
+  //      setShowSuccessModel(false);
+      
+  //     }, 2000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [showSuccessModel]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [showSuccessModel]);
   return (
     <SafeAreaView className="bg-black justify-center items-center flex-1">
       <SuccessModel visiblity={showSuccessModel} />

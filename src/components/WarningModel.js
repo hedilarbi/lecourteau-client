@@ -3,11 +3,28 @@ import React from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Fonts } from "../constants";
 import { useNavigation } from "@react-navigation/native";
-const WarningModel = ({ setShowWarningModel, showWarningModel, text }) => {
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translation = {
+  en: {
+    text: "You can't proceed without being logged in",
+    button: "Sign In",
+  },
+  fr: {
+    text: "Vous ne pouvez pas continuer sans être connecté",
+    button: "Se connecter",
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
+const WarningModel = ({ setShowWarningModel, showWarningModel }) => {
   const navigation = useNavigation();
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       visible={showWarningModel}
       onRequestClose={() => setShowWarningModel(false)}
@@ -34,7 +51,7 @@ const WarningModel = ({ setShowWarningModel, showWarningModel, text }) => {
                 fontSize: 14,
               }}
             >
-              You Can't proceed without being logged in
+              {i18n.t("text")}
             </Text>
             <View className="flex-row justify-center">
               <TouchableOpacity
@@ -42,7 +59,7 @@ const WarningModel = ({ setShowWarningModel, showWarningModel, text }) => {
                 onPress={() => navigation.navigate("SignUp")}
               >
                 <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 14 }}>
-                  Sign In
+                  {i18n.t("button")}
                 </Text>
               </TouchableOpacity>
             </View>

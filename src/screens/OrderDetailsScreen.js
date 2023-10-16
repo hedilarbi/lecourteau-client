@@ -70,7 +70,9 @@ const OrderDetailsScreen = () => {
 
   const handleOrderStatusColor = (status) => {
     switch (status) {
-      case "Done":
+      case "Ready":
+        return "#2AB2DB";
+      case "Delivered":
         return "#2AB2DB";
 
       case "On Going":
@@ -150,7 +152,7 @@ const OrderDetailsScreen = () => {
           <Text
             className="ml-3 w-3/4"
             style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
-            numberOfLines={1}
+            numberOfLines={2}
           >
             {order.address}
           </Text>

@@ -54,11 +54,20 @@ const CheckoutScreen = () => {
 
   const [cardDetails, setCardDetails] = useState();
   const { confirmPayment, loading } = useConfirmPayment();
-  const { email } = useSelector(selectUser);
+  const user = useSelector(selectUser);
+  
+  const [refresh,setRefresh] = useState(0)
 
   const dispatch = useDispatch();
 
   const [deliveryMode, setDeliveryMode] = useState("delivery");
+  
+  const [initialRegion,setInitialRegion] = useState({
+    latitude: location.latitude,
+    longitude: location.longitude,
+    latitudeDelta: 0.06,
+    longitudeDelta: 0.06,
+  })
   const [markers, setMarkers] = useState([
     {
       id: 1,
@@ -76,22 +85,17 @@ const CheckoutScreen = () => {
   ]);
 
   const cardInputRef = useRef(null);
-  const initialRegion = {
-    latitude: location.latitude,
-    longitude: location.longitude,
-    latitudeDelta: 0.06,
-    longitudeDelta: 0.06,
-  };
   const navigation = useNavigation();
 
+
   const processOrder = async () => {
-    if (!cardDetails?.complete || !email) {
+    if (!cardDetails?.complete || !user.email) {
       // Alert.alert("Please enter Complete card details and Email");
       cardInputRef.current.focus();
       return;
     }
     const billingDetails = {
-      email: email,
+      email: user.email,
     };
     setIsLoading(true);
 
@@ -123,6 +127,29 @@ const CheckoutScreen = () => {
       }
     );
   };
+  useEffect(()=>{
+    setInitialRegion({
+     latitude: location.latitude,
+     longitude: location.longitude,
+     latitudeDelta: 0.06,
+     longitudeDelta: 0.06,
+   })
+    setMarkers([
+      {
+        id: 1,
+        title: "Marker 1",
+        coordinate: {
+          latitude: location.latitude,
+          longitude: location.longitude,
+        },
+      },
+      {
+        id: 2,
+        title: "Marker 2",
+        coordinate: { latitude: 46.302301400000005, longitude: -72.6610984 },
+      },
+    ])
+  },[address,location])
   useEffect(() => {
     if (deliveryMode === "delivery") {
       setTotal(delivery_fee + parseFloat(subTotal) + tps + tvq);
@@ -188,6 +215,7 @@ const CheckoutScreen = () => {
           isDetailsModalVisible={isDetailsModalVisible}
           setIsDetailsModalVisible={setIsDetailsModalVisible}
           address={address}
+          addresses={user.addresses}
           text={{
             title: i18n.t("order_details_title"),
             section: i18n.t("select_address_text"),
@@ -280,7 +308,7 @@ const CheckoutScreen = () => {
                 <View
                   style={{
                     flexDirection: "row",
-                    alignItems: "center",
+
                     gap: 10,
                     marginTop: 8,
                   }}
@@ -295,7 +323,7 @@ const CheckoutScreen = () => {
                       fontFamily: Fonts.LATO_REGULAR,
                       fontSize: 14,
                     }}
-                    numberOfLines={1}
+                    numberOfLines={2}
                     className="w-3/4"
                   >
                     {address}
@@ -314,7 +342,7 @@ const CheckoutScreen = () => {
                 <View
                   style={{
                     flexDirection: "row",
-                    alignItems: "center",
+
                     gap: 10,
                     marginTop: 8,
                   }}
@@ -325,9 +353,10 @@ const CheckoutScreen = () => {
                       fontFamily: Fonts.LATO_REGULAR,
                       fontSize: 14,
                     }}
-                    numberOfLines={1}
+                    numberOfLines={2}
+                    className="w-3/4"
                   >
-                    9866 Chem. Sainte-Marguerite, Trois-Rivières
+                    3331 rue des prairies trois rivières, Québec G8V 1W7
                   </Text>
                 </View>
               </>
@@ -335,7 +364,7 @@ const CheckoutScreen = () => {
               <View
                 style={{
                   flexDirection: "row",
-                  alignItems: "center",
+
                   gap: 10,
                   marginTop: 8,
                 }}
@@ -346,9 +375,10 @@ const CheckoutScreen = () => {
                     fontFamily: Fonts.LATO_REGULAR,
                     fontSize: 14,
                   }}
-                  numberOfLines={1}
+                  className="w-3/4"
+                  numberOfLines={2}
                 >
-                  9866 Chem. Sainte-Marguerite, Trois-Rivières
+                  3331 rue des prairies trois rivières, Québec G8V 1W7
                 </Text>
               </View>
             )}

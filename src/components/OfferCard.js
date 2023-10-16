@@ -22,7 +22,11 @@ const OfferCard = ({ name, id, image, uid, price, items }) => {
         </View>
         <View className=" flex-1 ml-3 justify-between ">
           <View className="flex-row items-center">
-            <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-sm">
+            <Text
+              style={{ fontFamily: Fonts.LATO_BOLD }}
+              className="text-sm w-1/2"
+              numberOfLines={1}
+            >
               {name}
             </Text>
           </View>
@@ -70,7 +74,7 @@ const OfferCard = ({ name, id, image, uid, price, items }) => {
               className="text-sm text-pr mr-2"
               style={{ fontFamily: Fonts.LATO_REGULAR }}
             >
-              View Details
+              Details
             </Text>
             {showDetails ? (
               <Entypo name="chevron-thin-up" size={16} color="#F7A600" />

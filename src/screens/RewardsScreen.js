@@ -17,6 +17,24 @@ import {
 } from "../redux/slices/userSlice";
 import { addRewardToBasket } from "../redux/slices/basketSlice";
 import Error from "../components/Error";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+
+const translation = {
+  en: {
+text:"Fidelity Points",
+button:"Redeem"
+  },
+  fr: {
+    text:"Points de fidélités",
+    button:"Echanger"
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const RewardsScreen = () => {
   const dispatch = useDispatch();
@@ -62,13 +80,13 @@ const RewardsScreen = () => {
     <SafeAreaView className="bg-bg flex-1 p-3">
       <View className="flex-row justify-between bg-white rounded-md px-3 py-5">
         <Text className="text" style={{ fontFamily: Fonts.LATO_BOLD }}>
-          Fidelity Points
+         {i18n.t('text')}
         </Text>
         <Text
           className="text text-tgry"
           style={{ fontFamily: Fonts.LATO_REGULAR }}
         >
-          {fidelity_points} pt
+          {fidelity_points} points
         </Text>
       </View>
       <ScrollView className="flex-1 bg-white mt-5 mb-10 rounded-md p-3 space-y-8">
@@ -95,7 +113,7 @@ const RewardsScreen = () => {
               onPress={() => addToBasket(reward)}
               disabled={reward.points > fidelity_points}
             >
-              <Text style={{ fontFamily: Fonts.LATO_REGULAR }}>Redeem</Text>
+              <Text style={{ fontFamily: Fonts.LATO_REGULAR }}>{i18n.t('button')}</Text>
             </TouchableOpacity>
           </View>
         ))}

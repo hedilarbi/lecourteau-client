@@ -14,8 +14,9 @@ import {
 import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import SetupProfileScreen from "../screens/SetupProfileScreen";
 import * as SplashScreen from "expo-splash-screen";
-import { Alert, StatusBar } from "react-native";
+import { Alert} from "react-native";
 import AuthNavigation from "./Auth/AuthNavigation";
+import { StatusBar } from "expo-status-bar";
 
 const RootNavigation = () => {
   const RootStack = createNativeStackNavigator();
@@ -58,11 +59,7 @@ const RootNavigation = () => {
 
   return (
     <>
-      <StatusBar
-        barStyle="light-content"
-        translucent={false}
-        backgroundColor="black"
-      />
+     <StatusBar style="light" translucent={false} backgroundColor="black"  />
       <NavigationContainer>
         <RootStack.Navigator>
           {!userToken && (

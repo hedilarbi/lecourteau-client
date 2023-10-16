@@ -43,18 +43,18 @@ const TabNavigation = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-        const data = notification.request.content.data;
+    // notificationListener.current =
+    //   Notifications.addNotificationReceivedListener((notification) => {
+    //     setNotification(notification);
+    //     const data = notification.request.content.data;
 
-        if (data && data.order_id) {
-          navigation.navigate("ProfileNav", {
-            screen: "Details",
-            params: { id: data.order_id },
-          });
-        }
-      });
+    //     if (data && data.order_id) {
+    //       navigation.navigate("ProfileNav", {
+    //         screen: "Details",
+    //         params: { id: data.order_id },
+    //       });
+    //     }
+    //   });
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {

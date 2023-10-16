@@ -2,7 +2,7 @@
 // ios : 879272250209-c3ashg2bv9aa1r0s392p3og5hlf5jthu.apps.googleusercontent.com
 //web: 879272250209-3jrgcljrq13b10k1eh5fk67js9a6lsln.apps.googleusercontent.com
 
-import { StatusBar } from "react-native";
+
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
@@ -10,9 +10,10 @@ import { Provider } from "react-redux";
 
 import RootNavigation from "./src/navigation/RootNavigation";
 import { store } from "./src/redux/store";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { STRIPE_PUBLIC_KEY } from "@env";
+import { StatusBar } from 'expo-status-bar';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,11 +41,7 @@ export default function App() {
     <Provider store={store}>
       <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
         <>
-          <StatusBar
-            translucent={true}
-            backgroundColor="transparent"
-            barStyle="dark-content"
-          />
+        <StatusBar style="dark" translucent={true} />
           <RootNavigation />
         </>
       </StripeProvider>

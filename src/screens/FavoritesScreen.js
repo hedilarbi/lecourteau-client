@@ -15,6 +15,25 @@ import { ScrollView } from "react-native";
 import { Fonts } from "../constants";
 import { Image } from "react-native";
 import { TouchableOpacity } from "react-native";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+
+const translation = {
+  en: {
+    empty:"Empty",
+   
+    button:"Remove"
+  },
+  fr:{
+    empty:"Vide",
+   
+    button:"Supprimer"
+  },
+};
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const FavoritesScreen = () => {
   const [favorites, setFavorites] = useState([]);
@@ -79,7 +98,7 @@ const FavoritesScreen = () => {
                     className="text-red-400"
                     style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
                   >
-                    remove item
+                   {i18n.t('button')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -89,7 +108,7 @@ const FavoritesScreen = () => {
       ) : (
         <View className="flex-1 bg-white justify-center items-center rounded-md">
           <Text style={{ fontFamily: Fonts.LATO_BOLD, fontSize: 18 }}>
-            Vide
+            {i18n.t('empty')}
           </Text>
         </View>
       )}

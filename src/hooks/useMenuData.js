@@ -42,7 +42,7 @@ const useMenuData = (setIsLoading, refresh) => {
           );
 
           setFilteredMenuItemsList(newMenuItemList);
-          setSelectedItem(index + 1);
+          setSelectedItem(index + 2);
           // flatListRef.current.scrollToIndex({ index: index + 1 });
         } else {
           setFilteredMenuItemsList(menuItemsResponse.data);

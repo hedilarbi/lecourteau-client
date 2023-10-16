@@ -1,6 +1,9 @@
 const convertDate = (dateInString) => {
-  const date = new Date(dateInString);
-  return date.toLocaleString("fr-FR");
+  let date = new Date(dateInString);
+
+  date = date.toString("fr-FR", { month: "long" });
+  date = date.substr(4, 17);
+  return date;
 };
 
 const formatDate = (rawDate) => {

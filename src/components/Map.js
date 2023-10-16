@@ -23,6 +23,13 @@ const Map = ({ setShowMap }) => {
     longitudeDelta: 0.02,
   };
 
+  const test = async () => {
+    const response = await Location.geocodeAsync(
+      "3331 rue des prairies trois rivières, Québec G8V 1W7"
+    );
+    console.log(response);
+  };
+
   const handlePlaceSelect = async (data, details) => {
     try {
       const { description } = details;
@@ -88,6 +95,9 @@ const Map = ({ setShowMap }) => {
       })
     );
   };
+  useEffect(() => {
+    test();
+  }, []);
   return (
     <View className="flex-1">
       <View className="absolute  px-3 w-full  flex-row top-7 z-30">

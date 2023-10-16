@@ -77,6 +77,7 @@ const ReviewModel = ({ modalVisible, setModalVisible, orderId, text }) => {
           <TextInput
             value={comment}
             className="py-2 text-base rounded-md bg-gray-100 px-2 my-2 "
+            placeholder={text.placeHolder}
             style={{ fontFamily: Fonts.LATO_REGULAR }}
             placeholderTextColor="gray"
             onChangeText={(text) => setComment(text)}
@@ -89,7 +90,7 @@ const ReviewModel = ({ modalVisible, setModalVisible, orderId, text }) => {
               className="text-center  text-base"
               style={{ fontFamily: Fonts.LATO_BOLD }}
             >
-              {text.send}
+              {text.button}
             </Text>
           </TouchableOpacity>
         </View>

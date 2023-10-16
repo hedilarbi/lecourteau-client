@@ -7,12 +7,12 @@ import { AntDesign } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import Menu from "../components/Menu";
 import Offers from "../components/Offers";
-import { selectBasket, selectBasketItems } from "../redux/slices/basketSlice";
+import { selectBasket } from "../redux/slices/basketSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { getCategories, getOffers } from "../services/FoodServices";
-import { API_URL } from "@env";
+
 import {
   selectUser,
   selectUserAddress,
@@ -36,6 +36,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import HomeFr from "../translation/fr/Home";
 import HomeEn from "../translation/en/Home";
+import useGetUserLocation from "../hooks/useGetUserLocation";
 
 const translation = {
   en: HomeEn,
@@ -45,11 +46,11 @@ const translation = {
 const i18n = new I18n(translation);
 i18n.locale = Localization.locale;
 i18n.enableFallback = true;
+Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
 
 const HomeScreen = () => {
   const [showMap, setShowMap] = useState(false);
 
-  Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -58,26 +59,34 @@ const HomeScreen = () => {
   const [showWarningBanner, setShowWarningBanner] = useState(false);
   const basket = useSelector(selectBasket);
   const [isLoading, setIsLoading] = useState(true);
-  const [addressIsLoading, setAddressIsLoading] = useState(true);
+
   const [refresh, setRefresh] = useState(0);
   const [errors, setErrors] = useState(false);
   const [showReviewModel, setShowReviewModel] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const user = useSelector(selectUser);
-
+  const { address ,location} = useSelector(selectUserAddress);
+  
+  
+  const {locationError,locationLoading}=useGetUserLocation()
   useEffect(() => {
-    if (Object.keys(user).length !== 0 && !user.expo_token) {
-      registerForPushNotificationsAsync().then(async (token) =>
-        updateUserExpoToken(user._id, token.data).then((response) => {
-          console.log(response);
-        })
+    
+    if (Object.keys(user).length !== 0 ) {
+      registerForPushNotificationsAsync().then(async (token) =>{
+        
+        if(token.data !== user.expo_token){
+          
+          updateUserExpoToken(user._id, token.data)
+        }
+      }
       );
     }
   }, []);
-
+  
   const fetchData = async () => {
-    setIsLoading(true);
+   
     setErrors(false);
+  
     try {
       const [categoriesResponse, offersResponse, settingsResponse] =
         await Promise.all([
@@ -85,7 +94,7 @@ const HomeScreen = () => {
           getOffers(),
           getRestaurantSettings(),
         ]);
-
+        
       if (categoriesResponse.status) {
         setCategories(categoriesResponse.data);
       } else {
@@ -111,71 +120,15 @@ const HomeScreen = () => {
       }
     } catch (error) {
       setErrors(true);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
-  const getUserLocation = async () => {
-    setAddressIsLoading(true);
-    try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-
-      const response = await Location.reverseGeocodeAsync(
-        {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        },
-        {
-          useGoogleMaps: true,
-        }
-      );
-
-      let streetNumber = "";
-      let street = "";
-      let region = "";
-      let city = "";
-
-      if (response[1]) {
-        streetNumber = response[1].streetNumber || "";
-        street = response[1].street || "";
-        region = response[1].region || "";
-        city = response[1].city || "";
-      }
-
-      const address =
-        streetNumber +
-        (streetNumber.length > 0 ? ", " : "") +
-        street +
-        (street.length > 0 ? ", " : "") +
-        region +
-        ", " +
-        city;
-
-      dispatch(
-        setUserAddress({
-          address: address,
-          location: {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          },
-        })
-      );
-    } catch (error) {
-      setErrors(true);
-    } finally {
-      setAddressIsLoading(false);
-    }
-  };
-
+  
   useEffect(() => {
-    getUserLocation();
+    setIsLoading(true)
     fetchData();
+    getLastOrder();
+    setIsLoading(false)
   }, [refresh]);
 
   const retrieveOrderId = async () => {
@@ -184,10 +137,12 @@ const HomeScreen = () => {
   };
 
   const getLastOrder = async () => {
+  
     const id = await retrieveOrderId();
     setOrderId(id);
 
     if (id) {
+    
       getOrder(id).then((response) => {
         if (response.status) {
           if (
@@ -199,13 +154,12 @@ const HomeScreen = () => {
         }
       });
     }
+  
   };
 
-  useEffect(() => {
-    getLastOrder();
-  });
+ 
 
-  if (isLoading || addressIsLoading) {
+  if (isLoading || locationLoading) {
     return (
       <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="black" />
@@ -219,7 +173,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView
-      className={showMap ? "flex-1 bg-bg " : "flex-1 bg-bg  px-3 py-4"}
+      className={showMap ? "flex-1 bg-bg " : "flex-1 bg-bg  px-3 pt-4"}
     >
       <ReviewModel
         modalVisible={showReviewModel}
@@ -258,6 +212,7 @@ const HomeScreen = () => {
           )}
           <UserAddress
             setShowMap={setShowMap}
+            address={address}
             text={i18n.t("current_location")}
           />
           <ScrollView showsVerticalScrollIndicator={false}>

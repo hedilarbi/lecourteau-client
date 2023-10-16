@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import { Modal } from "react-native";
@@ -6,18 +6,20 @@ import { TouchableOpacity } from "react-native";
 import { Dimensions } from "react-native";
 import { Fonts } from "../constants";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
-import { selectUser, setUserAddress } from "../redux/slices/userSlice";
+import { useDispatch } from "react-redux";
+import { setUserAddress } from "../redux/slices/userSlice";
 
 const EditOrderModal = ({
   isDetailsModalVisible,
   setIsDetailsModalVisible,
   address,
   text,
+  addresses
 }) => {
-  const { addresses } = useSelector(selectUser);
+ 
   const [addressesList, setAddressesList] = useState([]);
   const dispatch = useDispatch();
+  
   const navigation = useNavigation();
   useEffect(() => {
     let list = [];
@@ -38,7 +40,7 @@ const EditOrderModal = ({
     });
 
     setAddressesList(list);
-  }, []);
+  }, [address,addresses]);
 
   const selectAddress = (newAddress, newCoords) => {
     const newList = addressesList.map((item) => {
@@ -83,7 +85,7 @@ const EditOrderModal = ({
             borderTopRightRadius: 16,
             height: Dimensions.get("window").height * 0.5, // Half of the screen height
           }}
-          className="bg-bg pb-3"
+          className="bg-white pb-3"
         >
           <View className="bg-white rounded-t-2xl ">
             <View className="px-3 my-3 flex-row items-center  justify-between ">
@@ -107,7 +109,7 @@ const EditOrderModal = ({
               </View>
             </View>
           </View>
-          <View className="flex-1">
+          <ScrollView className="flex-1">
             <Text
               className="text-sm px-3 my-3"
               style={{ fontFamily: Fonts.LATO_BOLD }}
@@ -132,13 +134,15 @@ const EditOrderModal = ({
                 </Text>
                 <Entypo name="plus" size={18} color="black" />
               </TouchableOpacity>
+            
+
               {addressesList.map((item, index) => {
                 return (
                   <TouchableOpacity
                     className=" flex-row justify-between items-center  border-gray-300 py-2 mt-2 "
                     onPress={() => selectAddress(item.address, item.coords)}
                     key={index}
-                  >
+                    >
                     <Text
                       style={{
                         fontFamily: Fonts.LATO_REGULAR,
@@ -146,7 +150,7 @@ const EditOrderModal = ({
                         width: "80%",
                       }}
                       numberOfLines={1}
-                    >
+                      >
                       {item.address}
                     </Text>
                     <View className="h-4 w-4 rounded-full border-pr border  justify-center items-center">
@@ -154,13 +158,14 @@ const EditOrderModal = ({
                         className={
                           item.is_selected ? "bg-pr h-2 w-2 rounded-full" : ""
                         }
-                      ></View>
+                        ></View>
                     </View>
                   </TouchableOpacity>
                 );
               })}
+         
             </View>
-          </View>
+          </ScrollView>
 
           <TouchableOpacity
             className="bg-pr rounded-md items-center justify-center py-2  mx-2"

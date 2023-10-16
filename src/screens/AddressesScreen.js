@@ -10,6 +10,27 @@ import {
 } from "../redux/slices/userSlice";
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+
+const translation = {
+  en: {
+    empty:"Empty",
+    title:"Add new Address",
+    button:""
+  },
+  fr:{
+    empty:"Vide",
+    title:"Ajouter une nouvelle adresse",
+    button:""
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 const AddressesScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -37,7 +58,7 @@ const AddressesScreen = () => {
     });
 
     setAddressesList(list);
-  }, []);
+  }, [addresses]);
 
   const selectAddress = (newAddress, newCoords) => {
     const newList = addressesList.map((item) => {
@@ -73,7 +94,7 @@ const AddressesScreen = () => {
                 fontSize: 14,
               }}
             >
-              Add new Address
+             {i18n.t('title')}
             </Text>
             <Entypo name="plus" size={18} color="black" />
           </TouchableOpacity>
@@ -109,7 +130,7 @@ const AddressesScreen = () => {
         <View className="flex-1">
           <View className="bg-white rounded-md justify-center items-center flex-1">
             <Text style={{ fontFamily: Fonts.LATO_BOLD }}>
-              Aucune Addresse Engregistré
+              {i18n.t('empty')}
             </Text>
           </View>
         </View>

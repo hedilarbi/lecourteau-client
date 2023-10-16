@@ -29,40 +29,22 @@ const DeleteWarning = ({ id, setShowDeleteWarning, text }) => {
     deleteUser(id)
       .then((response) => {
         if (response.status) {
-          setShowSuccessModel(true);
+          
+          dispatch(clearUser());
+         
         } else {
-          setShowFailModal(true);
+         setShowDeleteWarning(false) 
         }
       })
       .finally(() => {
-        setIsLoading(false);
-      });
-  };
-  useEffect(() => {
-    if (showSuccessModel) {
-      // After 1 second, reset showSuccessModel to false
-
-      const timer = setTimeout(() => {
-        dispatch(clearUser());
-        setShowSuccessModel(false);
-        setShowDeleteWarning(false);
+        setIsLoading(false)
         navigation.reset({
           index: 0,
-          routes: [{ name: "SignUp" }],
+          routes: [{ name: "Auth" }],
         });
-      }, 3000);
-
-      return () => clearTimeout(timer); // Clear the timer if the component unmounts before 1 second
-    }
-
-    if (showFailModal) {
-      const timer = setTimeout(() => {
-        setShowFailModal(flase);
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [showSuccessModel, showFailModal]);
+      });
+  };
+  
 
   return (
     <View style={styles.container}>

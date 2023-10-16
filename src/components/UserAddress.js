@@ -6,8 +6,8 @@ import { Fonts } from "../constants";
 import { useSelector } from "react-redux";
 import { selectUserAddress } from "../redux/slices/userSlice";
 
-const UserAddress = ({ setShowMap, text }) => {
-  const { address } = useSelector(selectUserAddress);
+const UserAddress = ({ setShowMap, text,address }) => {
+
 
   return (
     <View className="bg-white rounded-md px-4 py-2 flex-row flex  items-center ">
