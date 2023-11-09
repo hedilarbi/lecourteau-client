@@ -17,6 +17,7 @@ export const orderSlice = createSlice({
         address: action.payload.address,
         type: action.payload.type,
         coords: action.payload.coords,
+        restaurant: action.payload.restaurant,
         order: {
           ...state.order,
           total: action.payload.total,

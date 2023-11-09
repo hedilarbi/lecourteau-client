@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash-yellow.png",
       "resizeMode": "cover",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F7A600"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -29,12 +29,16 @@
         ]
       }
     },
+    "androidStatusBar": {
+      "backgroundColor": "#F7A600",
+      "translucent": false
+    },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
 
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
       "config": {
         "googleMaps": {
@@ -52,17 +56,22 @@
         "projectId": "cfd95bcc-7f5d-4868-b417-28aee71e3a2f"
       }
     },
-    "plugins": [["expo-localization"],[
-      
+    "plugins": [
+      ["expo-localization"],
+      [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
           "color": "#000000",
-          "sounds": [
-            "./assets/sounds/notificationsound.wav"
-          ]
+          "sounds": ["./assets/sounds/notificationsound.wav"]
         }
-      
-    ]]
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Permettre $(PRODUCT_NAME) d'accèder à votre emplacement"
+        }
+      ]
+    ]
   }
 }

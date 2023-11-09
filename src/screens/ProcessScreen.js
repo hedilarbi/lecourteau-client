@@ -43,33 +43,34 @@ const ProcessScreen = () => {
 
   const processOrder = async () => {
     setError(false);
-    createOrder(order)
-      .then(async (response) => {
-        if (response?.status) {
-          await setItemAsync("orderId", response.data.orderId);
-          dispatch(setUser(response.data.user));
-          dispatch(clearBasket());
-        
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [
-                { name: 'ProfileNav',state:{
-                  routes:[
+    createOrder(order).then(async (response) => {
+      if (response?.status) {
+        await setItemAsync("orderId", response.data.orderId);
+        dispatch(setUser(response.data.user));
+        dispatch(clearBasket());
+
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [
+              {
+                name: "ProfileNav",
+                state: {
+                  routes: [
                     {
-            name:"Details",params:{id:response.data.orderId}
-                    }]
-                } },
-              
-              ],
-            })
-          );
-        } else {
-          setError(true);
-          console.log(response);
-        }
-      })
-      
+                      name: "Details",
+                      params: { id: response.data.orderId },
+                    },
+                  ],
+                },
+              },
+            ],
+          })
+        );
+      } else {
+        setError(true);
+      }
+    });
   };
   useEffect(() => {
     processOrder();
@@ -80,7 +81,7 @@ const ProcessScreen = () => {
   //     const timer = setTimeout(() => {
   //       dispatch(clearBasket());
   //      setShowSuccessModel(false);
-      
+
   //     }, 2000);
 
   //     return () => clearTimeout(timer);

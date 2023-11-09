@@ -9,7 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser, selectUserAddress } from "../redux/slices/userSlice";
 import { Dimensions } from "react-native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { selectSettings } from "../redux/slices/settingsSlice";
+import {
+  selectRestaurant,
+  selectSettings,
+} from "../redux/slices/settingsSlice";
 import { selectBasketTotal } from "../redux/slices/basketSlice";
 import LogoFocused from "../../assets/icons/LogoFocused.svg";
 
@@ -29,8 +32,6 @@ import CheckoutFr from "../translation/fr/Checkout";
 import CheckoutEn from "../translation/en/Checkout";
 import { Image } from "react-native";
 
-import Logo from '../../assets/icons/Logo.svg'
-
 const translation = {
   en: CheckoutEn,
   fr: CheckoutFr,
@@ -49,7 +50,7 @@ const CheckoutScreen = () => {
   const [showPayementFailModel, setShowPayementFailModel] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-
+  const restaurant = useSelector(selectRestaurant);
   const { delivery_fee } = useSelector(selectSettings);
   const subTotal = useSelector(selectBasketTotal);
   const tps = (subTotal * 5) / 100;
@@ -58,19 +59,19 @@ const CheckoutScreen = () => {
   const [cardDetails, setCardDetails] = useState();
   const { confirmPayment, loading } = useConfirmPayment();
   const user = useSelector(selectUser);
-  
-  const [refresh,setRefresh] = useState(0)
+
+  const [refresh, setRefresh] = useState(0);
 
   const dispatch = useDispatch();
 
   const [deliveryMode, setDeliveryMode] = useState("delivery");
-  
-  const [initialRegion,setInitialRegion] = useState({
+
+  const [initialRegion, setInitialRegion] = useState({
     latitude: location.latitude,
-          longitude: location.longitude,
+    longitude: location.longitude,
     latitudeDelta: 0.09,
     longitudeDelta: 0.09,
-  })
+  });
   const [markers, setMarkers] = useState([
     {
       id: 1,
@@ -79,19 +80,19 @@ const CheckoutScreen = () => {
         latitude: location.latitude,
         longitude: location.longitude,
       },
-     
     },
     {
       id: 2,
       title: "Marker 2",
-      coordinate: { latitude: 46.302301400000005, longitude: -72.6610984 },
-      
+      coordinate: {
+        latitude: restaurant.location.latitude,
+        longitude: restaurant.location.longitude,
+      },
     },
   ]);
 
   const cardInputRef = useRef(null);
   const navigation = useNavigation();
-
 
   const processOrder = async () => {
     if (!cardDetails?.complete || !user.email) {
@@ -132,13 +133,13 @@ const CheckoutScreen = () => {
       }
     );
   };
-  useEffect(()=>{
+  useEffect(() => {
     setInitialRegion({
-     latitude: location.latitude,
-     longitude: location.longitude,
-     latitudeDelta: 0.06,
-     longitudeDelta: 0.06,
-   })
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.06,
+      longitudeDelta: 0.06,
+    });
     setMarkers([
       {
         id: 1,
@@ -147,16 +148,17 @@ const CheckoutScreen = () => {
           latitude: location.latitude,
           longitude: location.longitude,
         },
-      
       },
       {
         id: 2,
         title: "Marker 2",
-        coordinate: { latitude: 46.302301400000005, longitude: -72.6610984 },
-       
+        coordinate: {
+          latitude: restaurant.location.latitude,
+          longitude: restaurant.location.longitude,
+        },
       },
-    ])
-  },[address,location])
+    ]);
+  }, [address, location]);
   useEffect(() => {
     if (deliveryMode === "delivery") {
       setTotal(delivery_fee + parseFloat(subTotal) + tps + tvq);
@@ -182,6 +184,7 @@ const CheckoutScreen = () => {
             address,
             coords: location,
             total: total.toFixed(2),
+            restaurant: restaurant._id,
           })
         );
         navigation.navigate("Process");
@@ -232,25 +235,27 @@ const CheckoutScreen = () => {
         />
         <View style={{ height: Dimensions.get("window").height * 0.3 }}>
           <MapView style={{ flex: 1 }} initialRegion={initialRegion}>
-          <Marker
-                key="1"
-                coordinate={
-                 { latitude: location.latitude,
-                  longitude: location.longitude,}
-                }
-                title="user"
-                
+            <Marker
+              key="1"
+              coordinate={{
+                latitude: location.latitude,
+                longitude: location.longitude,
+              }}
+              title="user"
+            />
+            <Marker
+              key="2"
+              coordinate={{
+                latitude: 46.302301400000005,
+                longitude: -72.6610984,
+              }}
+              title="user"
+            >
+              <Image
+                source={require("../../assets/icon.png")}
+                style={{ width: 50, height: 25 }}
               />
-          <Marker
-                key="2"
-                coordinate={
-                  { latitude: 46.302301400000005, longitude: -72.6610984 }
-                }
-                title="user"
-                
-              >
-                <Image source={require('../../assets/icon.png')} style={{width:50 ,height:25}} />
-</Marker>
+            </Marker>
             {markers.length === 2 && (
               <MapViewDirections
                 origin={markers[0].coordinate}
@@ -375,7 +380,7 @@ const CheckoutScreen = () => {
                     numberOfLines={2}
                     className="w-3/4"
                   >
-                    3331 rue des prairies trois rivières, Québec G8V 1W7
+                    {restaurant.address}
                   </Text>
                 </View>
               </>

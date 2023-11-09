@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Fonts } from "../constants";
+import { Fonts, OrderStatus } from "../constants";
 
 const OrderCard = ({ status, createdAt, total, id }) => {
   const navigation = useNavigation();
@@ -11,15 +11,17 @@ const OrderCard = ({ status, createdAt, total, id }) => {
 
   const handleOrderStatusColor = (status) => {
     switch (status) {
-      case "Done":
+      case OrderStatus.READY:
+        return "#2AB2DB";
+      case OrderStatus.DONE:
+        return "#2AB2DB";
+      case OrderStatus.IN_DELIVERY:
         return "#2AB2DB";
 
-      case "On Going":
+      case OrderStatus.ON_GOING:
         return "#F3A32B";
-      case "Canceled":
+      case OrderStatus.CANCELED:
         return "#FF0707";
-      case "On Delivery":
-        return "#2AED49";
     }
   };
 

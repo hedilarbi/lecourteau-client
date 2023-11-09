@@ -1,11 +1,11 @@
 import { View, Text } from "react-native";
 import React, { memo } from "react";
-import { Fonts, NewsItems } from "../constants";
+import { Fonts } from "../constants";
 import { FlatList } from "react-native";
 
 import NewsItem from "./NewsItem";
 
-const News = memo(({ text }) => {
+const News = memo(({ text, items }) => {
   return (
     <>
       <View className="mt-4">
@@ -17,9 +17,9 @@ const News = memo(({ text }) => {
       <View className="h-36 mt-4">
         <FlatList
           horizontal
-          data={NewsItems}
+          data={items}
           renderItem={({ item }) => <NewsItem item={item} />}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           showsHorizontalScrollIndicator={false}
         />
       </View>

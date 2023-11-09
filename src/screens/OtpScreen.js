@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   TextInput,
+  Alert,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -72,13 +73,20 @@ const OtpScreen = ({ route }) => {
     //     });
     //   }
     // });
-    createUser(phoneNumber).then((response) => {
-      if (response.status) {
-        saveUserToken(response.data.token);
-        dispatch(setUserToken(response.data.token));
-        dispatch(setUser(response.data.user));
-      }
-    });
+
+    createUser(phoneNumber)
+      .then((response) => {
+        if (response.status) {
+          saveUserToken(response.data.token);
+          dispatch(setUserToken(response.data.token));
+          dispatch(setUser(response.data.user));
+        } else {
+          Alert.alert("Problème de connexion");
+        }
+      })
+      .catch((err) => {
+        Alert.alert();
+      });
     setIsLoading(false);
   };
 
@@ -89,7 +97,7 @@ const OtpScreen = ({ route }) => {
     <SafeAreaView className="bg-bg flex-1">
       {isLoading && (
         <View
-          className="justify-center items-center h-full w-full absolute top-0 left-0 z-40"
+          className="justify-center items-center flex-1 absolute top-0 left-0 z-40"
           style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
         >
           <ActivityIndicator size="large" color="#F7A600" />

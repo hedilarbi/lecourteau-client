@@ -6,11 +6,12 @@ const getRestaurantSettings = async () => {
     let getRestaurantSettingsResponse = await axios.get(`${API_URL}/settings`, {
       timeout: 10000,
     });
+
     if (getRestaurantSettingsResponse.status === 200) {
       return {
         status: true,
         message: "order data",
-        data: getRestaurantSettingsResponse.data[0],
+        data: getRestaurantSettingsResponse.data,
       };
     } else {
       return {

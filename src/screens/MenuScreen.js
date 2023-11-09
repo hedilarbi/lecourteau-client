@@ -20,6 +20,8 @@ import MenuFr from "../translation/fr/Menu";
 import MenuEn from "../translation/en/Menu";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+import { RefreshControl } from "react-native";
+import { selectRestaurant } from "../redux/slices/settingsSlice";
 
 const translation = {
   en: MenuEn,
@@ -35,6 +37,7 @@ const MenuScreen = ({ navigation }) => {
   const basket = useSelector(selectBasket);
   const totalPrice = useSelector(selectBasketTotal);
   const { favorites } = useSelector(selectUser);
+  const restaurant = useSelector(selectRestaurant);
 
   const [refresh, setRefresh] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -42,20 +45,21 @@ const MenuScreen = ({ navigation }) => {
   const filterMenuItems = (index, item) => {
     setSelectedItem(index);
 
-    if (item.name === "All") {
+    if (item.name === "Menu") {
       setFilteredMenuItemsList(menuItemsList);
-      return null;
-    }
-    if (item.name === "Favorites") {
-      const list = menuItemsList.filter((item) => favorites.includes(item._id));
+    } else if (item.name === "Favorites" || item.name === "Favoris") {
+      const list = menuItemsList.filter((item) =>
+        favorites.includes(item.menuItem._id)
+      );
 
       setFilteredMenuItemsList(list);
-      return null;
+    } else {
+      const newMenuItemList = menuItemsList.filter(
+        (menuItem) => menuItem.menuItem.category.name === item.name
+      );
+
+      setFilteredMenuItemsList(newMenuItemList);
     }
-    const newMenuItemList = menuItemsList.filter(
-      (menuItem) => menuItem.category.name === item.name
-    );
-    setFilteredMenuItemsList(newMenuItemList);
   };
 
   const {
@@ -66,7 +70,7 @@ const MenuScreen = ({ navigation }) => {
     selectedItem,
     setSelectedItem,
     errors,
-  } = useMenuData(setIsLoading, refresh);
+  } = useMenuData(setIsLoading, refresh, restaurant._id);
 
   const renderItem = ({ item, index }) => (
     <TouchableOpacity
@@ -99,7 +103,7 @@ const MenuScreen = ({ navigation }) => {
       {(basket?.offers?.length > 0 ||
         basket?.items.length > 0 ||
         basket?.rewards.length > 0) && (
-        <View className="absolute bottom-0 bg-transparent flex-row items-center px-2 w-full z-30 mb-4">
+        <View className="absolute bottom-0 bg-transparent flex-row items-center px-2 w-full z-30 mb-2">
           <TouchableOpacity
             className="flex-1 bg-pr flex-row justify-between items-center px-10 py-3"
             onPress={() => navigation.navigate("Card")}
@@ -144,15 +148,21 @@ const MenuScreen = ({ navigation }) => {
       {filteredMenuItemsList.length > 0 ? (
         <FlatList
           data={filteredMenuItemsList}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={() => setRefresh((prev) => prev + 1)}
+            />
+          }
           renderItem={({ item }) => (
             <MenuItem
-              name={item.name}
-              image={item.image}
-              id={item._id}
-              description={item.description}
-              prices={item.prices}
-              key={item._id}
-              is_available={item.is_available}
+              name={item.menuItem.name}
+              image={item.menuItem.image}
+              id={item.menuItem._id}
+              description={item.menuItem.description}
+              prices={item.menuItem.prices}
+              key={item.menuItem._id}
+              is_available={item.availability}
               setIsLoading={setIsProcessing}
               text={{
                 customize: i18n.t("customize_button"),
@@ -161,13 +171,17 @@ const MenuScreen = ({ navigation }) => {
               }}
             />
           )}
-          keyExtractor={(item) => item._id}
-          contentContainerStyle={{ paddingHorizontal: 2, paddingVertical: 4 }}
+          keyExtractor={(item) => item.menuItem._id}
+          contentContainerStyle={{
+            paddingHorizontal: 2,
+            paddingVertical: 4,
+            paddingBottom: 56,
+          }}
         />
       ) : (
         <View className="p-2 rounded-md justify-center items-center flex-1 bg-white">
           <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-base">
-            Empty
+            Vide
           </Text>
         </View>
       )}

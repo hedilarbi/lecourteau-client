@@ -71,13 +71,23 @@ const MenuNavigation = () => {
       <MenuStack.Screen
         name="Customize"
         component={CustomizeScreen}
-        options={{
-          title: i18n.t("customize"),
+        options={({ navigation }) => ({
+          title: i18n.t("customize"), // Optional: You can set a custom title
+
           headerTitleStyle: {
             fontFamily: Fonts.BEBAS_NEUE,
             fontSize: 20,
           },
-        }}
+
+          headerLeft: (props) => (
+            <HeaderBackButton
+              {...props}
+              onPress={() => {
+                navigation.navigate("Home");
+              }}
+            />
+          ),
+        })}
       />
       <MenuStack.Screen
         name="Checkout"

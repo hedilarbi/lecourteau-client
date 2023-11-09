@@ -11,7 +11,11 @@ import { selectBasket } from "../redux/slices/basketSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
-import { getCategories, getOffers } from "../services/FoodServices";
+import {
+  getCategories,
+  getNewItems,
+  getOffers,
+} from "../services/FoodServices";
 
 import {
   selectUser,
@@ -31,12 +35,12 @@ import ReviewModel from "../components/ReviewModel";
 import { getItemAsync } from "expo-secure-store";
 import { getOrder } from "../services/OrderServices";
 
-
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import HomeFr from "../translation/fr/Home";
 import HomeEn from "../translation/en/Home";
 import useGetUserLocation from "../hooks/useGetUserLocation";
+import { RefreshControl } from "react-native";
 
 const translation = {
   en: HomeEn,
@@ -46,7 +50,6 @@ const translation = {
 const i18n = new I18n(translation);
 i18n.locale = Localization.locale;
 i18n.enableFallback = true;
-
 
 const HomeScreen = () => {
   const [showMap, setShowMap] = useState(false);
@@ -64,51 +67,35 @@ const HomeScreen = () => {
   const [errors, setErrors] = useState(false);
   const [showReviewModel, setShowReviewModel] = useState(false);
   const [orderId, setOrderId] = useState(null);
+  const [newItems, setNewItems] = useState([]);
   const user = useSelector(selectUser);
-  const { address ,location} = useSelector(selectUserAddress);
-  
-  
-  const {locationError,locationLoading}=useGetUserLocation()
+  const { address, location } = useSelector(selectUserAddress);
+
+  const { locationError, locationLoading } = useGetUserLocation();
   useEffect(() => {
-    
-    if (Object.keys(user).length !== 0 ) {
-      registerForPushNotificationsAsync().then(async (token) =>{
-        
-        if(token.data !== user.expo_token){
-          
-          updateUserExpoToken(user._id, token.data)
+    if (Object.keys(user).length !== 0) {
+      registerForPushNotificationsAsync().then(async (token) => {
+        if (token.data !== user.expo_token) {
+          updateUserExpoToken(user._id, token.data);
         }
-      }
-      );
+      });
     }
   }, []);
-  
+
   const fetchData = async () => {
-   
     setErrors(false);
-  
+
     try {
-      const [categoriesResponse, offersResponse, settingsResponse] =
-        await Promise.all([
-          getCategories(),
-          getOffers(),
-          getRestaurantSettings(),
-        ]);
-        
+      const [categoriesResponse, offersResponse, newItemsResponse] =
+        await Promise.all([getCategories(), getOffers(), getNewItems()]);
+
       if (categoriesResponse.status) {
         setCategories(categoriesResponse.data);
       } else {
         setErrors(true);
       }
-      if (settingsResponse.status) {
-        dispatch(setSettings(settingsResponse.data));
-
-        if (
-          settingsResponse.data.open === false ||
-          settingsResponse.data.delivey === false
-        ) {
-          setShowWarningBanner(true);
-        }
+      if (newItemsResponse.status) {
+        setNewItems(newItemsResponse.data);
       } else {
         setErrors(true);
       }
@@ -119,16 +106,16 @@ const HomeScreen = () => {
         setErrors(true);
       }
     } catch (error) {
+      console.log(error.message);
       setErrors(true);
-    } 
+    }
   };
 
-  
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     fetchData();
     getLastOrder();
-    setIsLoading(false)
+    setIsLoading(false);
   }, [refresh]);
 
   const retrieveOrderId = async () => {
@@ -137,12 +124,10 @@ const HomeScreen = () => {
   };
 
   const getLastOrder = async () => {
-  
     const id = await retrieveOrderId();
     setOrderId(id);
 
     if (id) {
-    
       getOrder(id).then((response) => {
         if (response.status) {
           if (
@@ -154,10 +139,7 @@ const HomeScreen = () => {
         }
       });
     }
-  
   };
-
- 
 
   if (isLoading || locationLoading) {
     return (
@@ -215,12 +197,21 @@ const HomeScreen = () => {
             address={address}
             text={i18n.t("current_location")}
           />
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingBottom: 16,
+            }}
+            refreshControl={
+              <RefreshControl refreshing={isLoading} onRefresh={fetchData} />
+            }
+          >
             <News
               text={{
                 button: i18n.t("all_button"),
                 title: i18n.t("new_section"),
               }}
+              items={newItems}
             />
 
             <Menu

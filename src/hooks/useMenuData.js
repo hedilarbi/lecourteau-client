@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import { getCategoriesNames, getMenuItems } from "../services/FoodServices";
+import {
+  getCategoriesNames,
+  getMenuItems,
+  getRestaurantItems,
+} from "../services/FoodServices";
 import { useRoute } from "@react-navigation/native";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 
-
 const translation = {
   en: {
-   all:"All",
-   favorites:"Favorites"
+    all: "All",
+    favorites: "Favorites",
   },
-  fr:{
-   all:"Tout",
-   favorites:"Favoris"
+  fr: {
+    all: "Tout",
+    favorites: "Favoris",
   },
 };
 
@@ -20,14 +23,13 @@ const i18n = new I18n(translation);
 i18n.locale = Localization.locale;
 i18n.enableFallback = true;
 
-const useMenuData = (setIsLoading, refresh) => {
+const useMenuData = (setIsLoading, refresh, restaurantId) => {
   const route = useRoute();
   const [errors, setErrors] = useState(false);
   const [menuCategories, setMenuCategories] = useState([]);
   const [filteredMenuItemsList, setFilteredMenuItemsList] = useState([]);
   const [menuItemsList, setMenuItemsList] = useState([]);
   const [selectedItem, setSelectedItem] = useState(0);
-  
 
   const fetchData = async () => {
     setErrors(false);
@@ -35,13 +37,13 @@ const useMenuData = (setIsLoading, refresh) => {
     try {
       const [categoriesNamesResponse, menuItemsResponse] = await Promise.all([
         getCategoriesNames(),
-        getMenuItems(),
+        getRestaurantItems(restaurantId),
       ]);
 
       if (categoriesNamesResponse.status) {
         setMenuCategories([
-          { _id: "0", name: i18n.t('all') },
-          { _id: "1", name: i18n.t('favorites') },
+          { _id: "0", name: "Menu" },
+          { _id: "1", name: i18n.t("favorites") },
           ...categoriesNamesResponse.data,
         ]);
       } else {
@@ -49,13 +51,14 @@ const useMenuData = (setIsLoading, refresh) => {
         return null;
       }
 
+      console.log(menuItemsResponse);
       if (menuItemsResponse.status) {
-        setMenuItemsList(menuItemsResponse.data);
-
+        setMenuItemsList(menuItemsResponse.data.menu_items);
         if (route.params) {
-          const newMenuItemList = menuItemsResponse.data.filter(
-            (menuItem) => menuItem.category.name === route.params.category
+          const newMenuItemList = menuItemsResponse.data.menu_items.filter(
+            (item) => item.menuItem.category.name === route.params.category
           );
+
           const index = categoriesNamesResponse.data.findIndex(
             (item) => item.name === route.params.category
           );
@@ -64,12 +67,13 @@ const useMenuData = (setIsLoading, refresh) => {
           setSelectedItem(index + 2);
           // flatListRef.current.scrollToIndex({ index: index + 1 });
         } else {
-          setFilteredMenuItemsList(menuItemsResponse.data);
+          setFilteredMenuItemsList(menuItemsResponse.data.menu_items);
         }
       } else {
         setErrors(true);
       }
     } catch (error) {
+      console.log(error.message);
       setErrors(true);
     } finally {
       setIsLoading(false);

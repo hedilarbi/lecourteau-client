@@ -2,7 +2,6 @@
 // ios : 879272250209-c3ashg2bv9aa1r0s392p3og5hlf5jthu.apps.googleusercontent.com
 //web: 879272250209-3jrgcljrq13b10k1eh5fk67js9a6lsln.apps.googleusercontent.com
 
-
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
@@ -13,7 +12,8 @@ import { store } from "./src/redux/store";
 
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { STRIPE_PUBLIC_KEY } from "@env";
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from "expo-status-bar";
+import "expo-dev-client";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,13 +38,17 @@ export default function App() {
     return null;
   }
   return (
-    <Provider store={store}>
-      <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
-        <>
-        <StatusBar style="dark" translucent={true} />
+    <>
+      <Provider store={store}>
+        <StripeProvider publishableKey={STRIPE_PUBLIC_KEY}>
+          <StatusBar
+            style="light"
+            translucent={false}
+            backgroundColor="black"
+          />
           <RootNavigation />
-        </>
-      </StripeProvider>
-    </Provider>
+        </StripeProvider>
+      </Provider>
+    </>
   );
 }

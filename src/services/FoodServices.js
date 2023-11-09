@@ -148,6 +148,86 @@ const getRewards = async () => {
   }
 };
 
+const getNewItems = async () => {
+  try {
+    let getNewItemsResponse = await axios.get(`${API_URL}/menuItems/new`, {
+      timeout: 10000,
+    });
+    if (getNewItemsResponse?.status === 200) {
+      return {
+        status: true,
+        message: "offers data fetched",
+        data: getNewItemsResponse?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "menu item data not found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
+const getRestaurantItems = async (id) => {
+  try {
+    let getNewItemsResponse = await axios.get(
+      `${API_URL}/restaurants/items/${id}`,
+      {
+        timeout: 10000,
+      }
+    );
+    if (getNewItemsResponse?.status === 200) {
+      return {
+        status: true,
+        message: "offers data fetched",
+        data: getNewItemsResponse?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: "menu item data not found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+const getRestaurantItem = async (id, restaurantId) => {
+  try {
+    let getNewItemsResponse = await axios.get(
+      `${API_URL}/restaurants/${restaurantId}/items/${id}`,
+      {
+        timeout: 10000,
+      }
+    );
+    if (getNewItemsResponse?.status === 200) {
+      return {
+        status: true,
+        message: "offers data fetched",
+        data: getNewItemsResponse?.data[0],
+      };
+    } else {
+      return {
+        status: false,
+        message: "menu item data not found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
 export {
   getCategories,
   getOffers,
@@ -155,4 +235,7 @@ export {
   getCategoriesNames,
   getMenuItem,
   getRewards,
+  getNewItems,
+  getRestaurantItems,
+  getRestaurantItem,
 };

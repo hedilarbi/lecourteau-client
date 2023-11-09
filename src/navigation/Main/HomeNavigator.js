@@ -4,11 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../../screens/HomeScreen";
 import OfferScreen from "../../screens/OfferScreen";
 import { Fonts } from "../../constants";
-import { useSelector } from "react-redux";
-import { selectUser } from "../../redux/slices/userSlice";
-import { registerForPushNotificationsAsync } from "../../services/NotificationsServices";
-import { useEffect } from "react";
-import { updateUserExpoToken } from "../../services/UserServices";
+
 const HomeNavigation = () => {
   const MenuStack = createNativeStackNavigator();
 

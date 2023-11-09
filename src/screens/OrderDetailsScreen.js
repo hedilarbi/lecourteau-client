@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { ActivityIndicator } from "react-native";
 import { ScrollView } from "react-native";
 
-import { Fonts } from "../constants";
+import { Fonts, OrderStatus } from "../constants";
 import Error from "../components/Error";
 import { convertDate } from "../utils/dateHandlers";
 
@@ -70,17 +70,17 @@ const OrderDetailsScreen = () => {
 
   const handleOrderStatusColor = (status) => {
     switch (status) {
-      case "Ready":
+      case OrderStatus.READY:
         return "#2AB2DB";
-      case "Delivered":
+      case OrderStatus.DONE:
+        return "#2AB2DB";
+      case OrderStatus.IN_DELIVERY:
         return "#2AB2DB";
 
-      case "On Going":
+      case OrderStatus.ON_GOING:
         return "#F3A32B";
-      case "Canceled":
+      case OrderStatus.CANCELED:
         return "#FF0707";
-      case "On Delivery":
-        return "#2AED49";
     }
   };
   if (isLoading) {

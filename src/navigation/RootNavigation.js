@@ -1,8 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 import TabNavigation from "./Main/TabNavigation";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import SignUpScreen from "../screens/SignUpScreen";
-import { useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserByToken } from "../services/UserServices";
 import {
@@ -14,23 +14,23 @@ import {
 import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import SetupProfileScreen from "../screens/SetupProfileScreen";
 import * as SplashScreen from "expo-splash-screen";
-import { Alert} from "react-native";
+
 import AuthNavigation from "./Auth/AuthNavigation";
 import { StatusBar } from "expo-status-bar";
+import { getRestaurantSettings } from "../services/RestaurantServices";
+import { setSettings } from "../redux/slices/settingsSlice";
 
 const RootNavigation = () => {
   const RootStack = createNativeStackNavigator();
   const userToken = useSelector(selectUserToken);
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
-
+  const [isLoading, setIsLoading] = useState(true);
   const getUserToken = async () => {
     let token;
     try {
       token = await getItemAsync("token");
-    } catch (err) {
-     
-    }
+    } catch (err) {}
     if (token) {
       getUserByToken(token)
         .then(async (response) => {
@@ -45,21 +45,38 @@ const RootNavigation = () => {
         })
         .finally(async () => {
           await SplashScreen.hideAsync();
+          setIsLoading(false);
         });
     } else {
       dispatch(setUser({}));
       dispatch(setUserToken(null));
+      setIsLoading(false);
       await SplashScreen.hideAsync();
     }
   };
 
+  const getSettings = async () => {
+    getRestaurantSettings().then((response) => {
+      if (response.status) {
+        dispatch(setSettings(response.data));
+      }
+    });
+  };
+
+  useEffect(() => {
+    getSettings();
+  }, []);
   useEffect(() => {
     getUserToken();
   }, [userToken]);
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <>
-     <StatusBar style="light" translucent={false} backgroundColor="black"  />
+      <StatusBar style="light" translucent={false} backgroundColor="black" />
       <NavigationContainer>
         <RootStack.Navigator>
           {!userToken && (

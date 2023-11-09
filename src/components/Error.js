@@ -18,7 +18,7 @@ const Error = ({ setRefresh }) => {
           style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
           className="text-tgry"
         >
-          Something Went Wrong
+          Quelque chose s'est mal passé
         </Text>
         <TouchableOpacity
           className="bg-pr rounded-md py-2 items-center flex-row  px-8  mt-3   "
@@ -29,7 +29,7 @@ const Error = ({ setRefresh }) => {
             style={{ fontFamily: Fonts.LATO_REGULAR, fontSize: 14 }}
             className="ml-2"
           >
-            Refresh
+            Rafraichir
           </Text>
         </TouchableOpacity>
       </View>

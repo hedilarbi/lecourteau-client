@@ -17,23 +17,26 @@ import {
   selectBasketItemWithUID,
   updateItemInBasket,
 } from "../redux/slices/basketSlice";
-import { getMenuItem } from "../services/FoodServices";
+import { getMenuItem, getRestaurantItem } from "../services/FoodServices";
 import Error from "../components/Error";
 import DropDown from "../components/DropDown";
 
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+import { selectRestaurant } from "../redux/slices/settingsSlice";
 
 const translation = {
   en: {
     size: "Choose size",
     customization: "Customization",
     price: "Price",
+    stock: "Out of Stock",
   },
   fr: {
     size: "Choisir la taille",
     customization: "Personnaliser",
     price: "Prix",
+    stock: "Rupture de stock",
   },
 };
 
@@ -45,7 +48,7 @@ const CustomizeScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
   const navigation = useNavigation();
-
+  const { _id: restaurantId } = useSelector(selectRestaurant);
   const [refresh, setRefresh] = useState(0);
   const [errors, setErrors] = useState(false);
   const [menuItem, setMenuItem] = useState(null);
@@ -63,10 +66,12 @@ const CustomizeScreen = () => {
   useEffect(() => {
     setErrors(false);
     setIsLoading(true);
-    getMenuItem(route.params.id)
+
+    getRestaurantItem(route.params.id, restaurantId)
       .then((response) => {
+        console.log(response);
         if (response?.status) {
-          const customizations = response?.data?.customization || [];
+          const customizations = response?.data?.menuItem.customization || [];
           const CustomizationList = {};
           customizations.forEach((item) => {
             if (!CustomizationList[item.category.name]) {
@@ -97,14 +102,14 @@ const CustomizeScreen = () => {
           });
 
           setCategorizedCustomization(CustomizationList);
-          const list = response.data.prices.map((item) => item.size);
+          const list = response.data.menuItem.prices.map((item) => item.size);
           setSizes(list);
           if (route.params.parent === "Card") {
             setPrice(itemFromBasket[0].price);
             setSize(itemFromBasket[0].size);
           } else {
-            setPrice(response.data.prices[0].price);
-            setSize(response.data.prices[0].size);
+            setPrice(response.data.menuItem.prices[0].price);
+            setSize(response.data.menuItem.prices[0].size);
           }
           setMenuItem(response?.data);
         } else {
@@ -118,7 +123,9 @@ const CustomizeScreen = () => {
 
   useEffect(() => {
     if (menuItem) {
-      const selectedItem = menuItem?.prices?.find((item) => item.size === size);
+      const selectedItem = menuItem?.menuItem.prices?.find(
+        (item) => item.size === size
+      );
       setPrice(selectedItem?.price);
     }
   }, [size]);
@@ -144,9 +151,9 @@ const CustomizeScreen = () => {
     if (route.params.parent === "Menu") {
       dispatch(
         addToBasket({
-          id: menuItem._id,
-          name: menuItem.name,
-          image: menuItem.image,
+          id: menuItem.menuItem._id,
+          name: menuItem.menuItem.name,
+          image: menuItem.menuItem.image,
           price: calculateTotalPrice(),
           size: size,
           customization: selectedItems,
@@ -201,26 +208,30 @@ const CustomizeScreen = () => {
       <ScrollView className="flex-1 ">
         <View className=" h-44 bg-gray-400">
           <Image
-            source={{ uri: menuItem.image }}
+            source={{ uri: menuItem.menuItem.image }}
             className="flex-1"
             style={{ resizeMode: "cover" }}
           />
-          {/* <View className=" absolute bottom-4 left-0 flex-row items-center  px-3 border">
-            <Text
-              style={{ fontFamily: Fonts.BEBAS_NEUE }}
-              className=" text-2xl text-pr"
+          {!menuItem.availability && (
+            <View
+              className="absolute h-44 w-full justify-end items-end p-3"
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
             >
-              {menuItem.name} :
               <Text
-                style={{ fontFamily: Fonts.LATO_REGULAR }}
-                className="text-sm text-gray-500"
+                style={{ fontFamily: Fonts.BEBAS_NEUE }}
+                className=" text-3xl text-red-700 "
               >
-                {menuItem.description}
+                {i18n.t("stock")}
               </Text>
-            </Text>
-          </View> */}
+            </View>
+          )}
         </View>
-
+        <Text
+          tyle={{ fontFamily: Fonts.LATO_BOLD }}
+          className="text-sm mx-3 mt-3"
+        >
+          {menuItem.menuItem.description}
+        </Text>
         <View className="flex-row items-center mt-3 px-3">
           <Text style={{ fontFamily: Fonts.BEBAS_NEUE }} className="text-base">
             {i18n.t("size")}
@@ -304,28 +315,28 @@ const CustomizeScreen = () => {
             </View>
           );
         })}
-      <View className="px-3 my-3 flex-row justify-between items-center">
-        <Text className="text-base" style={{ fontFamily: Fonts.LATO_BOLD }}>
-          {i18n.t("price")}
-        </Text>
-        <Text
-          style={{ fontFamily: Fonts.LATO_BOLD }}
-          className="text-sm text-gray-500  "
+        <View className="px-3 my-3 flex-row justify-between items-center">
+          <Text className="text-base" style={{ fontFamily: Fonts.LATO_BOLD }}>
+            {i18n.t("price")}
+          </Text>
+          <Text
+            style={{ fontFamily: Fonts.LATO_BOLD }}
+            className="text-sm text-gray-500  "
+          >
+            {calculateTotalPrice()} $
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          className="bg-pr rounded-md items-center justify-center py-2 mx-3 mb-4"
+          onPress={addItemToBasket}
+          disabled={!menuItem.availability}
         >
-          {calculateTotalPrice()} $
-        </Text>
-      </View>
-
-      <TouchableOpacity
-        className="bg-pr rounded-md items-center justify-center py-2 mx-3 mb-4"
-        onPress={addItemToBasket}
-      >
-        <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
-          {route.params.parent === "Menu" ? "Add To Card" : "Save"}
-        </Text>
-      </TouchableOpacity>
+          <Text style={{ fontFamily: Fonts.LATO_BOLD }} className="text-lg">
+            {route.params.parent === "Menu" ? "Add To Card" : "Save"}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
-
     </View>
   );
 };
