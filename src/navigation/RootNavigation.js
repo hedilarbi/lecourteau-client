@@ -29,7 +29,7 @@ const RootNavigation = () => {
     try {
       token = await getItemAsync("token");
     } catch (err) {
-      Alert.alert("Something Went wrong");
+     
     }
     if (token) {
       getUserByToken(token)

@@ -253,13 +253,13 @@ const CustomizeScreen = () => {
                     key={topping._id}
                   >
                     <View className="flex-1 flex-row items-center ">
-                      <View className="h-8 w-8 rounded-full">
+                      {/* <View className="h-8 w-8 rounded-full">
                         <Image
                           source={{ uri: topping.image }}
                           className="flex-1 rounded-full"
                           style={{ resizeMode: "cover" }}
                         />
-                      </View>
+                      </View> */}
                       <Text
                         style={{ fontFamily: Fonts.LATO_REGULAR }}
                         className="text-sm ml-3"
@@ -304,8 +304,6 @@ const CustomizeScreen = () => {
             </View>
           );
         })}
-      </ScrollView>
-
       <View className="px-3 my-3 flex-row justify-between items-center">
         <Text className="text-base" style={{ fontFamily: Fonts.LATO_BOLD }}>
           {i18n.t("price")}
@@ -326,6 +324,8 @@ const CustomizeScreen = () => {
           {route.params.parent === "Menu" ? "Add To Card" : "Save"}
         </Text>
       </TouchableOpacity>
+      </ScrollView>
+
     </View>
   );
 };

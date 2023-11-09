@@ -4,7 +4,8 @@ import * as Location from "expo-location"
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { setUserAddress } from "../redux/slices/userSlice";
-
+import { GOOGLE_MAPS_API_KEY } from "@env";
+Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
 
 const useGetUserLocation = () => {
     const dispatch = useDispatch()
@@ -19,9 +20,9 @@ const useGetUserLocation = () => {
       if (status !== "granted") {
         return;
       }
-      
+      console.log("start locating")
       let location = await Location.getCurrentPositionAsync();
-      console.log("location")
+      console.log("location",location)
       const response = await Location.reverseGeocodeAsync(
         {
           latitude: location.coords.latitude,

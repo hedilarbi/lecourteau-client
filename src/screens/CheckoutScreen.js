@@ -27,6 +27,9 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import CheckoutFr from "../translation/fr/Checkout";
 import CheckoutEn from "../translation/en/Checkout";
+import { Image } from "react-native";
+
+import Logo from '../../assets/icons/Logo.svg'
 
 const translation = {
   en: CheckoutEn,
@@ -64,9 +67,9 @@ const CheckoutScreen = () => {
   
   const [initialRegion,setInitialRegion] = useState({
     latitude: location.latitude,
-    longitude: location.longitude,
-    latitudeDelta: 0.06,
-    longitudeDelta: 0.06,
+          longitude: location.longitude,
+    latitudeDelta: 0.09,
+    longitudeDelta: 0.09,
   })
   const [markers, setMarkers] = useState([
     {
@@ -76,11 +79,13 @@ const CheckoutScreen = () => {
         latitude: location.latitude,
         longitude: location.longitude,
       },
+     
     },
     {
       id: 2,
       title: "Marker 2",
       coordinate: { latitude: 46.302301400000005, longitude: -72.6610984 },
+      
     },
   ]);
 
@@ -142,11 +147,13 @@ const CheckoutScreen = () => {
           latitude: location.latitude,
           longitude: location.longitude,
         },
+      
       },
       {
         id: 2,
         title: "Marker 2",
         coordinate: { latitude: 46.302301400000005, longitude: -72.6610984 },
+       
       },
     ])
   },[address,location])
@@ -225,13 +232,25 @@ const CheckoutScreen = () => {
         />
         <View style={{ height: Dimensions.get("window").height * 0.3 }}>
           <MapView style={{ flex: 1 }} initialRegion={initialRegion}>
-            {markers.map((marker) => (
-              <Marker
-                key={marker.id}
-                coordinate={marker.coordinate}
-                title={marker.title}
+          <Marker
+                key="1"
+                coordinate={
+                 { latitude: location.latitude,
+                  longitude: location.longitude,}
+                }
+                title="user"
+                
               />
-            ))}
+          <Marker
+                key="2"
+                coordinate={
+                  { latitude: 46.302301400000005, longitude: -72.6610984 }
+                }
+                title="user"
+                
+              >
+                <Image source={require('../../assets/icon.png')} style={{width:50 ,height:25}} />
+</Marker>
             {markers.length === 2 && (
               <MapViewDirections
                 origin={markers[0].coordinate}

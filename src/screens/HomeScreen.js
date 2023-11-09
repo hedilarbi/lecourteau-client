@@ -30,7 +30,7 @@ import { updateUserExpoToken } from "../services/UserServices";
 import ReviewModel from "../components/ReviewModel";
 import { getItemAsync } from "expo-secure-store";
 import { getOrder } from "../services/OrderServices";
-import { GOOGLE_MAPS_API_KEY } from "@env";
+
 
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -46,7 +46,7 @@ const translation = {
 const i18n = new I18n(translation);
 i18n.locale = Localization.locale;
 i18n.enableFallback = true;
-Location.setGoogleApiKey(GOOGLE_MAPS_API_KEY);
+
 
 const HomeScreen = () => {
   const [showMap, setShowMap] = useState(false);

@@ -52,6 +52,17 @@
         "projectId": "cfd95bcc-7f5d-4868-b417-28aee71e3a2f"
       }
     },
-    "plugins": ["expo-localization"]
+    "plugins": [["expo-localization"],[
+      
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#000000",
+          "sounds": [
+            "./assets/sounds/notificationsound.wav"
+          ]
+        }
+      
+    ]]
   }
 }

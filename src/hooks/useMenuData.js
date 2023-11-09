@@ -1,6 +1,24 @@
 import { useEffect, useState } from "react";
 import { getCategoriesNames, getMenuItems } from "../services/FoodServices";
 import { useRoute } from "@react-navigation/native";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+
+const translation = {
+  en: {
+   all:"All",
+   favorites:"Favorites"
+  },
+  fr:{
+   all:"Tout",
+   favorites:"Favoris"
+  },
+};
+
+const i18n = new I18n(translation);
+i18n.locale = Localization.locale;
+i18n.enableFallback = true;
 
 const useMenuData = (setIsLoading, refresh) => {
   const route = useRoute();
@@ -9,6 +27,7 @@ const useMenuData = (setIsLoading, refresh) => {
   const [filteredMenuItemsList, setFilteredMenuItemsList] = useState([]);
   const [menuItemsList, setMenuItemsList] = useState([]);
   const [selectedItem, setSelectedItem] = useState(0);
+  
 
   const fetchData = async () => {
     setErrors(false);
@@ -21,8 +40,8 @@ const useMenuData = (setIsLoading, refresh) => {
 
       if (categoriesNamesResponse.status) {
         setMenuCategories([
-          { _id: "0", name: "All" },
-          { _id: "1", name: "Favorites" },
+          { _id: "0", name: i18n.t('all') },
+          { _id: "1", name: i18n.t('favorites') },
           ...categoriesNamesResponse.data,
         ]);
       } else {
