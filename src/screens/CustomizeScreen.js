@@ -69,7 +69,6 @@ const CustomizeScreen = () => {
 
     getRestaurantItem(route.params.id, restaurantId)
       .then((response) => {
-        console.log(response);
         if (response?.status) {
           const customizations = response?.data?.menuItem.customization || [];
           const CustomizationList = {};

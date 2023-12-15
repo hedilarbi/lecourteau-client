@@ -51,7 +51,6 @@ const useMenuData = (setIsLoading, refresh, restaurantId) => {
         return null;
       }
 
-      console.log(menuItemsResponse);
       if (menuItemsResponse.status) {
         setMenuItemsList(menuItemsResponse.data.menu_items);
         if (route.params) {

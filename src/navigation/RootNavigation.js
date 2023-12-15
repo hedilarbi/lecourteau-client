@@ -34,7 +34,7 @@ const RootNavigation = () => {
     if (token) {
       getUserByToken(token)
         .then(async (response) => {
-          if (response.status) {
+          if (response?.status && response.data) {
             dispatch(setUser(response.data));
             dispatch(setUserToken(token));
           } else {

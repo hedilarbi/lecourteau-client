@@ -32,7 +32,7 @@ import Error from "../components/Error";
 import { registerForPushNotificationsAsync } from "../services/NotificationsServices";
 import { updateUserExpoToken } from "../services/UserServices";
 import ReviewModel from "../components/ReviewModel";
-import { getItemAsync } from "expo-secure-store";
+import { deleteItemAsync, getItemAsync } from "expo-secure-store";
 import { getOrder } from "../services/OrderServices";
 
 import * as Localization from "expo-localization";
@@ -69,9 +69,11 @@ const HomeScreen = () => {
   const [orderId, setOrderId] = useState(null);
   const [newItems, setNewItems] = useState([]);
   const user = useSelector(selectUser);
+
   const { address, location } = useSelector(selectUserAddress);
 
   const { locationError, locationLoading } = useGetUserLocation();
+
   useEffect(() => {
     if (Object.keys(user).length !== 0) {
       registerForPushNotificationsAsync().then(async (token) => {
@@ -81,7 +83,6 @@ const HomeScreen = () => {
       });
     }
   }, []);
-
   const fetchData = async () => {
     setErrors(false);
 
@@ -128,14 +129,16 @@ const HomeScreen = () => {
     setOrderId(id);
 
     if (id) {
-      getOrder(id).then((response) => {
-        if (response.status) {
+      getOrder(id).then(async (response) => {
+        if (response.status && response.data) {
           if (
             response.data.status === "Delivered" &&
             response.data.review.status === false
           ) {
             setShowReviewModel(true);
           }
+        } else {
+          await deleteItemAsync("orderId");
         }
       });
     }

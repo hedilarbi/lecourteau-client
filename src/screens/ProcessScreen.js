@@ -45,8 +45,8 @@ const ProcessScreen = () => {
     setError(false);
     createOrder(order).then(async (response) => {
       if (response?.status) {
-        await setItemAsync("orderId", response.data.orderId);
         dispatch(setUser(response.data.user));
+        await setItemAsync("orderId", response.data.orderId);
         dispatch(clearBasket());
 
         navigation.dispatch(

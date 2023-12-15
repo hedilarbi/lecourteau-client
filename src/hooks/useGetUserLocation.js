@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import * as Location from "expo-location";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import { setUserAddress } from "../redux/slices/userSlice";
+import { selectUserAddress, setUserAddress } from "../redux/slices/userSlice";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import {
   selectRestaurants,
@@ -17,11 +17,10 @@ const useGetUserLocation = () => {
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState(null);
   const restaurants = useSelector(selectRestaurants);
+  const userAddress = useSelector(selectUserAddress);
   let address;
-
   const getUserLocation = async () => {
     setLocationLoading(true);
-
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -32,6 +31,7 @@ const useGetUserLocation = () => {
         accuracy: Location.Accuracy.Highest,
         maximumAge: 10000,
       });
+
       const response = await Location.reverseGeocodeAsync(
         {
           latitude: location.coords.latitude,
@@ -88,7 +88,7 @@ const useGetUserLocation = () => {
   };
 
   useEffect(() => {
-    if (restaurants.length > 0) {
+    if (restaurants.length > 0 && !userAddress.address) {
       getUserLocation();
     }
   }, [restaurants]);
